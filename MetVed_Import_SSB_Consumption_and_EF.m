@@ -57,7 +57,7 @@ fprintf('In file \n%s\n',SSBfile)
 
 if do_Residential
     %----------------------------------------------------------------------
-    fprintf('RESIDENTIAL\n')
+    fprintf('\n*RESIDENTIAL\n')
     %----------------------------------------------------------------------
     % Read Norwegian counties of the file
     fprintf('\tReading Residential sheet: %s\n',ResSheet)
@@ -118,7 +118,7 @@ end
 
 if do_Cabins
     %--------------------------------------------------------------------------
-    fprintf('CABINS\n')
+    fprintf('\n*CABINS\n')
     %--------------------------------------------------------------------------
     fprintf('\tReading Cabin sheet      : %s\n',CabSheet)
     clear y yi

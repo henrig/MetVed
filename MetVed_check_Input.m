@@ -46,7 +46,7 @@ end
 fprintf('\n%s\n',text_div)
 
 % Struct the input file Names for later.
-ifiles = cell(10,1);
+ifiles = cell(9,1);
 ifiles(1)  = {MunicpalGeoFile};
 ifiles(2)  = {CountyGeoFile};
 ifiles(3)  = {LandGeoFile};
@@ -56,7 +56,6 @@ ifiles(6)  = {SSBfile};
 ifiles(7)  = {OvenDensity};
 ifiles(8)  = {HouseSizes};
 ifiles(9)  = {HouseEnergy};
-ifiles(10) = {ResidentialFile};
 
 % Check the files if they exist. If they do not exist do not keepo their
 % names.
