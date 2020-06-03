@@ -55,7 +55,7 @@ catch
 end
 fprintf('In file \n%s\n',SSBfile)
 
-if do_residential
+if do_Residential
     %----------------------------------------------------------------------
     fprintf('RESIDENTIAL\n')
     %----------------------------------------------------------------------
@@ -96,7 +96,7 @@ if do_residential
                 tmp(Tech)       = TFT.Teknologi;
             end
             R = (Cons(i,2,yr)+Cons(i,3,yr)+Cons(i,4,yr))/Cons(i,1,yr);
-            if R<0.9 || R<1.1; fprintf('Ceck inconsistent data: C: %s Y: %i \n', char(FylkesNavn(i)),y(yr)); end
+            if R<0.9 || R>1.1; fprintf('Ceck inconsistent data: C: %s Y: %i %2.1f\n', char(FylkesNavn(i)),y(yr),R); end
             for comp = 1:height(Tef)
                 Efac             = Tef(comp,:);
                 EFres(i,comp,yr) = ( table2array(Efac(1,contains(hlEF,'Open')))*Cons(i,2,yr) + ...
@@ -116,7 +116,7 @@ if do_residential
     fprintf('Found Emission Factors (EF) for \n%i Fylker \n%i Compounds \n%i Years\n',size(EFres))
 end
 
-if do_cabins
+if do_Cabins
     %--------------------------------------------------------------------------
     fprintf('CABINS\n')
     %--------------------------------------------------------------------------
@@ -161,8 +161,6 @@ if do_cabins
                 end
                 tmp(Tech) = TFT.Teknologi;
             end
-            R = (Cons(i,2,yr)+Cons(i,3,yr)+Cons(i,4,yr))/Cons(i,1,yr);
-            if R<0.9 || R<1.1; fprintf('Ceck inconsistent data: C: %s Y: %i \n', char(FylkesNavn(i)),y(yr)); end
             for comp = 1:height(Tef)
                 Efac = Tef(comp,:);
                 EFcab(i,comp,yr) = (table2array(Efac(1,contains(hlEF,'Open')))*Cons(i,2,yr) + ...

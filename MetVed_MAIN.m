@@ -1,13 +1,12 @@
 % 
 fprintf('In MetVed_MAIN\n\n')
 % add needed global fields
-
+global ifiles
 
 % MAIN
 MetVed_check_Input()
 
 [EFdata] = MetVed_Import_SSB_Consumption_and_EF();
-
 
 % Need input from data 
 out = MetVed_GeoProcess_Buildings(Res/Cab);
