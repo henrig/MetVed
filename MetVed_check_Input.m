@@ -11,19 +11,23 @@ function MetVed_check_Input
 %
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
+fprintf('In MetVed_check_Input\n\n')
 % paths:
 global pname ipath opath tpath  
 % files:
 global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile 
 global SSBfile OvenDensity HouseSizes HouseEnergy ResidentialFile
+global text_div 
+%--------------------------------------------------------------------------
+global ifiles
 
 % Test folders existence
 if exist(pname,'dir')~=7 &&  exist(ipath,'dir')~=7 &&  exist(tpath,'dir')~=7
     error('not an existing folder')
 else
-    fprintf('MetVed will run in Folder: \n%s\n',pname)
-    fprintf('MetVed input Folder:       \n%s\n',ipath)
-    fprintf('MetVed uses Temp Folder:   \n%s\n',ipath)
+    fprintf('MetVed will run in Folder: %s\n',pname)
+    fprintf('MetVed input Folder:       %s\n',ipath)
+    fprintf('MetVed uses Temp Folder:   %s\n',ipath)
 end
 fprintf('\n%s\n',text_div)
 % Give the option to create the output folder:
@@ -42,24 +46,25 @@ end
 fprintf('\n%s\n',text_div)
 
 % Struct the input file Names for later.
-ifile(1)  = {MunicpalGeoFile};
-ifile(2)  = {CountyGeoFile};
-ifile(3)  = {LandGeoFile};
-ifile(4)  = {TopographyFile};
-ifile(5)  = {CoastLineFile};
-ifile(6)  = {SSBfile};
-ifile(7)  = {OvenDensity};
-ifile(8)  = {HouseSizes};
-ifile(9)  = {HouseEnergy};
-ifile(10) = {ResidentialFile};
+ifiles = cell(10,1);
+ifiles(1)  = {MunicpalGeoFile};
+ifiles(2)  = {CountyGeoFile};
+ifiles(3)  = {LandGeoFile};
+ifiles(4)  = {TopographyFile};
+ifiles(5)  = {CoastLineFile};
+ifiles(6)  = {SSBfile};
+ifiles(7)  = {OvenDensity};
+ifiles(8)  = {HouseSizes};
+ifiles(9)  = {HouseEnergy};
+ifiles(10) = {ResidentialFile};
 
 % Check the files if they exist. If they do not exist do not keepo their
 % names.
-for i=1:length(ifile)
-    tmp = exist(ifile(i),'file');
+for i=1:length(ifiles)
+    tmp = exist(char(ifiles(i)),'file');
     if tmp ~=2
-       warning(sprintf('Non existent input file \n %s\n',ifile(i)) )
-       ifile(i)={''};
+       warning(sprintf('Non existent input file \n %s\n',char(ifiles(i))) )
+       ifiles(i)={'empty'};
     end
 end
 
