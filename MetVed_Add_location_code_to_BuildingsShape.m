@@ -1,13 +1,15 @@
 function [Sout] = MetVed_Add_location_code_to_BuildingsShape(K,S)
+%--------------------------------------------------------------------------
+% Metved: Emissions from Residential Wood Combustion 
+%--------------------------------------------------------------------------
+% Explanation goes here: 
+% Part of MetVed_v2: GeoProcess two shapefields of different resolution.
+% Placing one or more variables from S to K based on GeoMatching.
 
-% Sfile ='/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/Shapefiles/SSB/2015/SSB_2015_250m_Dwelling';
-% Kfile = '/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/Shapefiles/Geographical/Municipalities/Kommuner2020';
-% Kfile = '/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/Shapefiles/Geographical/Counties/Norway_Fylke_Administrative_Borders';
-% Kfile = '/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/Shapefiles/Geographical/Landsdel/NO_Landsdel';
-% S = shaperead(Sfile);
-% K = shaperead(Kfile);
 
-
+% 1st  NILU: Jan 2018: Henrik Grythe
+% rev: NILU: Jun 2020: Henrik Grythe 
+%--------------------------------------------------------------------------
 fields = fieldnames(K);
 % Three distinct properties can be added
 types = [{'KOMMUNENUM'},{'FYLKESNR'},{'NUTS_ID'}];
@@ -92,11 +94,12 @@ if ~ismember(Ftype,'Point')
     Kommune(nk) = tk(:,1);
 end
 
-T = struct2table(S);
+% Create and rename the variable. Then remake into a structure array.
+T         = struct2table(S);
 T.OldName = Kommune;
-idx = find(ismember(T.Properties.VariableNames,{'OldName'}));
+idx       = find(ismember(T.Properties.VariableNames,{'OldName'}));
 fprintf('Added field to Struct:\n%s\n****\n',char(fieldADD(t)))
 T.Properties.VariableNames(idx) = fieldADD(t);
-Sout = table2struct(T);
+Sout      = table2struct(T);
 end
 
