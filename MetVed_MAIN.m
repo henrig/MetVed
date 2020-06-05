@@ -25,13 +25,14 @@ if do_Residential
     Res = MetVed_GeoProcess_Buildings(Res);
     if use_temporary_files
         save(tfiles.Residential,'Res')
+        fprintf('Saved a new version of %s\n',tfiles.Residential)
     end
 end
 
 if do_Cabins
     Cab = MetVed_GeoProcess_Buildings(Cab);
     if use_temporary_files
-        save(tfiles.Cabins,'Cab')
+        save(tfiles.Cabins,'Cab');  fprintf('Saved a new version of %s\n',tfiles.Cabins)
     end
 end
 

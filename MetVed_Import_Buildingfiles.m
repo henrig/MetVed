@@ -43,7 +43,7 @@ if do_Residential
             fprintf('Loaded temporary file from Temp\n')
             tfiles.Residential =tf; 
         catch
-            fprintf('No file found in Temp\n')
+            fprintf('No file found from :%s\n',tf)
             ifiles(a+1) = {ResFile};
             fprintf('Reading large file ...')
             Res = shaperead(ResFile);
@@ -81,7 +81,7 @@ if do_Cabins
         ce = split(CabFile,'/');
         try
             tf = strcat('Temp/',char(ce(end)),'.mat');
-            fprintf('Loaded temporary file from Temp\n')
+            fprintf('Loaded temporary file from :%s\n',tf)
             load(tf)
             tfiles.Cabins =tf; 
         catch

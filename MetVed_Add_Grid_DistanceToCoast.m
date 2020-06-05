@@ -5,17 +5,9 @@ function [Sout] = MetVed_Add_Grid_DistanceToCoast(S,T)
 % Metres Above Sea Level.
 % Function assumes equal projection.
 %--------------------------------------------------------------------------
-% S = Input shape of GRID
-% T = Topografic reference file
-
-
-% Sfile ='/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/Shapefiles/SSB/2015/SSB_2015_250m_Dwelling';
-% S = shaperead(Sfile);
-% 
-% 
-% Tfile = '/storage/nilu/Inby/Emission_Group/Ancillary_Data/ShapeFiles/Geo/NO_coastline';
-% T = shaperead(Tfile);
-% tfields = fieldnames(T);
+global text_div
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_Add_Grid_DistanceToCoast\n\n')
 
 
 Ftype = S(1).Geometry;

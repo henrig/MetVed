@@ -33,8 +33,8 @@ end
 
 if ~isfield(S,'CoastDST')
     T = shaperead(CoastLineFile);
-    S  = MetVed_Add_Grid_Elevation(S,T);
+    S  = MetVed_Add_Grid_DistanceToCoast(S,T);
 end
-
+Sout = S;
 end
 

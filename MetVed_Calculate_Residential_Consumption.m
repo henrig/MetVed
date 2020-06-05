@@ -7,7 +7,7 @@ function [] = MetVed_Calculate_Residential_Consumption()
 % NILU: Jan 2018: Henrik Grythe
 %--------------------------------------------------------------------------
 
-global DryWoodFactor Emission_year Ratio
+global DryWoodFactor Emission_year Ratio text_div
 
 
 fprintf('\n%s\n',text_div)
@@ -18,32 +18,42 @@ Ey  = find(EFdata.res3D ==Emission_year);
 
 Tfylke = table;
 
-Tfylke.ResFylker = unique(extractfield(Res,'FYLKE'))';
+Tfylke.ResFylker = unique(extractfield(Res,'FylkesNR'))';
 % Check that it matches the fylkes in the GeoFile:
 
 % Extract the existing fylkes number in the file:
+fprintf('Using dry Wood Factor of: %f \n',DryWoodFactor)
 Cons1D = squeeze(EFdata.resCON(:,:,Ey))*DryWoodFactor;
+EF1D   = array2table(squeeze(EFdata.resEF(:,:,Ey)')');
+spec   = EFdata.res2D;
+EF1D.Properties.VariableNames=spec;
+
 
 FylkeNr    = EFdata.res1D;
 FylkesNavn = EFdata.res1Dn;
 
 % Write out no match Fylkes:
-for i =1: height(T)
-    idx = (T.ResFylker == FylkeNr);
+Tn =[];
+for i =1: height(Tfylke)
+    T = table;
+    idx = find(FylkeNr == Tfylke.ResFylker(i));
+    if ~isempty(idx)
+        T.FylkeNavn(i) = FylkesNavn(idx);
+        T.FylkeNr(i)   = FylkeNr(idx);
+        T.ConsTot(i)   = Cons1D(idx,1);
+        Tn = [Tn;[T(i,:),EF1D(idx,:)]];
+    else
+       fprintf('WARNING! No consumption for Fylke %i\n',Tfylke.ResFylker(i)) 
+    end
 end
-
-fprintf('Using dry Wood Factor of: %f \n',DryWoodFactor)
-for i = 1:length(EFmatchCONS)
-   fprintf('%02i%16s, Total Consumption: %6.1f = %6.1f Dry Wood : EF_PM2.5 = %6.2f\n',FylkeNr(i),char(FylkesNavn(i)),Cons(i,1),Consumption(i),EF(i,1,Ey))
-end
-
-
-
-
 
 %--------------------------------------------------------------------------
 % 1st: Loop Fylker to extract Fylke -level statistics
 %--------------------------------------------------------------------------
+
+% get fp_ variables 
+% get ALL variable
+
 
 for i=1:length(Fylker)
     If  = ALL(:,1)==Fylker(i);
