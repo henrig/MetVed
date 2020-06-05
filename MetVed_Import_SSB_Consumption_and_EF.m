@@ -109,8 +109,9 @@ if do_Residential
         end
     end
     % Store outdata in struct.
+    EFdata.resCON  = Cons;
     EFdata.resEF   = EFres;
-    EFdata.res1D   = FylkesNavn;
+    EFdata.res1Dn  = FylkesNavn;
     EFdata.res1D   = FylkeNr;
     EFdata.res2D   = table2cell(Tef(:,1));
     EFdata.res3D   = y;
@@ -175,9 +176,10 @@ if do_Cabins
     end
     fprintf('Found Emission Factors (EF) for \n%i Fylker \n%i Compounds \n%i Years\n',size(EFcab))
     % Store outdata in struct.
+    EFdata.cabCON    = Cons;
     EFdata.cabEF     = EFres;
-    EFdata.cab1D     = FylkesNavn;
-    EFdata.cab1Dn    = FylkeNr;
+    EFdata.cab1Dn    = FylkesNavn;
+    EFdata.cab1D     = FylkeNr;
     EFdata.cab2D     = table2cell(Tef(:,1));
     EFdata.cab3D     = y;
 end

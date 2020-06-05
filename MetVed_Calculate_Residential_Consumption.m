@@ -7,29 +7,33 @@ function [] = MetVed_Calculate_Residential_Consumption()
 % NILU: Jan 2018: Henrik Grythe
 %--------------------------------------------------------------------------
 
-global DryWoodFactor
+global DryWoodFactor Emission_year
 
+% Extract the right years data:
+Ey  = find(EFdata.res3D ==Emission_year);
 
+% Extract the existing fylkes number in the file:
+Cons1D = squeeze(EFdata.Cons(:,:,Ey))*DryWoodFactor;
+Fylker = EFdata.res1D;
 
+% Check that it matches the fylkes in the GeoFile:
+Ef     = 
 
-fy          = find(y==yyyy);
+% Write out no match Fylkes:
 
-
-
-Consumption = squeeze(Cons(1:19,1,fy))*DryWoodFactor;
 
 fprintf('Using dry Wood Factor of: %f \n',DryWoodFactor)
-for i = 1:19
-   fprintf('%02i%16s, Total Consumption: %6.1f = %6.1f Dry Wood : EF_PM2.5 = %6.2f\n',FylkeNr(i),char(FylkesNavn(i)),Cons(i,1,fy),Consumption(i),EF(i,1,fy))
+for i = 1:length(EFmatchCONS)
+   fprintf('%02i%16s, Total Consumption: %6.1f = %6.1f Dry Wood : EF_PM2.5 = %6.2f\n',FylkeNr(i),char(FylkesNavn(i)),Cons(i,1,Ey),Consumption(i),EF(i,1,Ey))
 end
 
 
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------------------------------------------------------------------
 % 1st: Loop Fylker to extract Fylke -level statistics
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------------------------------------------------------------------
 
 for i=1:length(Fylker)
     If  = ALL(:,1)==Fylker(i);
@@ -57,9 +61,9 @@ for i=1:length(Fylker)
 end
 save(sprintf('Number_of_Houses_with_FP_in_%04i.mat',yyyy),'N_CU_F','CpCU_F','CF','Consumption')
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------------------------------------------------------------------
 % 2nd Loop Kommuner to extract Kommune -level statistics
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------------------------------------------------------------------
 for i=1:length(Kommuner)
     Ik=ALL(:,2)==Kommuner(i);
     Ify=fn==unique(ALL(Ik,1));

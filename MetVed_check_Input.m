@@ -11,16 +11,17 @@ function MetVed_check_Input
 %
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
-fprintf('\n%s\n',text_div)
-fprintf('In MetVed_check_Input\n\n')
 % paths:
 global pname ipath opath tpath  
 % files:
 global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile 
-global SSBfile OvenDensity HouseSizes HouseEnergy ResidentialFile
+global SSBfile OvenDensity HouseSizes HouseEnergy
 global text_div 
-%--------------------------------------------------------------------------
 global ifiles
+%--------------------------------------------------------------------------
+
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_check_Input\n\n')
 
 % Test folders existence
 if exist(pname,'dir')~=7 &&  exist(ipath,'dir')~=7 &&  exist(tpath,'dir')~=7
