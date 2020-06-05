@@ -23,6 +23,9 @@ global ifiles
 
 % Test folders existence
 if exist(pname,'dir')~=7 &&  exist(ipath,'dir')~=7 &&  exist(tpath,'dir')~=7
+    if exist(pname,'dir')~=7; fprintf('%s',pname);end
+    if exist(ipath,'dir')~=7; fprintf('%s',ipath);end
+    if exist(tpath,'dir')~=7; fprintf('%s',tpath);end
     error('not an existing folder')
 else
     fprintf('MetVed will run in Folder: %s\n',pname)
@@ -60,10 +63,14 @@ ifiles(9)  = {HouseEnergy};
 % Check the files if they exist. If they do not exist do not keepo their
 % names.
 for i=1:length(ifiles)
-    tmp = exist(char(ifiles(i)),'file');
+    id  = ~isempty(ifiles{i});
+    if id; tmp = exist(char(ifiles{i}),'file'); else; ifiles(i)={'empty'}; end
     if tmp ~=2
-       warning(sprintf('Non existent input file \n %s\n',char(ifiles(i))) )
-       ifiles(i)={'empty'};
+        id2 = exist(strcat(tmp,'.shp'));
+        if id2~=2
+            warning(sprintf('Non existent input file \n %s\n',char(ifiles(i))) )
+            ifiles(i)={'empty'};
+        end
     end
 end
 
