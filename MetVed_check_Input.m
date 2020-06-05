@@ -11,6 +11,7 @@ function MetVed_check_Input
 %
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
+fprintf('\n%s\n',text_div)
 fprintf('In MetVed_check_Input\n\n')
 % paths:
 global pname ipath opath tpath  
@@ -60,15 +61,15 @@ ifiles(7)  = {OvenDensity};
 ifiles(8)  = {HouseSizes};
 ifiles(9)  = {HouseEnergy};
 
-% Check the files if they exist. If they do not exist do not keepo their
-% names.
+% Check the files if they exist. If they do not exist do not keep their
+% names. Add a test for file extension .shp.
 for i=1:length(ifiles)
     id  = ~isempty(ifiles{i});
     if id; tmp = exist(char(ifiles{i}),'file'); else; ifiles(i)={'empty'}; end
     if tmp ~=2
-        id2 = exist(strcat(tmp,'.shp'));
+        id2 = exist(strcat(char(ifiles(i)),'.shp'));
         if id2~=2
-            warning(sprintf('Non existent input file \n %s\n',char(ifiles(i))) )
+            fprintf('WARNING Non existent input file \n %s\n',char(ifiles(i)))
             ifiles(i)={'empty'};
         end
     end

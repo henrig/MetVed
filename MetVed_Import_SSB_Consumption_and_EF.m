@@ -16,8 +16,9 @@ function [EFdata] = MetVed_Import_SSB_Consumption_and_EF()
 %
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
-global SSBfile debug_mode do_Cabins do_Residential
-
+global SSBfile debug_mode do_Cabins do_Residential text_div
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_Import_SSB_Consumption_and_EF\n\n')
 
 % Four categories of consumption is assumed.
 FP_type=[{'ALL'},{'Open'},{'Old'},{'New'}];

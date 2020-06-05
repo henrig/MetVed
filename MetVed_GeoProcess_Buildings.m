@@ -33,7 +33,5 @@ if ~isfield(S,'CoastDST')
     S  = MetVed_Add_Grid_Elevation(S,T);
 end
 
-
-
 end
 
