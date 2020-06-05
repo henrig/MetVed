@@ -7,24 +7,34 @@ function [] = MetVed_Calculate_Residential_Consumption()
 % NILU: Jan 2018: Henrik Grythe
 %--------------------------------------------------------------------------
 
-global DryWoodFactor Emission_year
+global DryWoodFactor Emission_year Ratio
 
-% Extract the right years data:
+
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_Calculate_Residential_Consumption\n\n')
+
+% Extract the position of the year for EF and Consumption data:
 Ey  = find(EFdata.res3D ==Emission_year);
 
-% Extract the existing fylkes number in the file:
-Cons1D = squeeze(EFdata.Cons(:,:,Ey))*DryWoodFactor;
-Fylker = EFdata.res1D;
+Tfylke = table;
 
+Tfylke.ResFylker = unique(extractfield(Res,'FYLKE'))';
 % Check that it matches the fylkes in the GeoFile:
-Ef     = 
+
+% Extract the existing fylkes number in the file:
+Cons1D = squeeze(EFdata.resCON(:,:,Ey))*DryWoodFactor;
+
+FylkeNr    = EFdata.res1D;
+FylkesNavn = EFdata.res1Dn;
 
 % Write out no match Fylkes:
-
+for i =1: height(T)
+    idx = (T.ResFylker == FylkeNr);
+end
 
 fprintf('Using dry Wood Factor of: %f \n',DryWoodFactor)
 for i = 1:length(EFmatchCONS)
-   fprintf('%02i%16s, Total Consumption: %6.1f = %6.1f Dry Wood : EF_PM2.5 = %6.2f\n',FylkeNr(i),char(FylkesNavn(i)),Cons(i,1,Ey),Consumption(i),EF(i,1,Ey))
+   fprintf('%02i%16s, Total Consumption: %6.1f = %6.1f Dry Wood : EF_PM2.5 = %6.2f\n',FylkeNr(i),char(FylkesNavn(i)),Cons(i,1),Consumption(i),EF(i,1,Ey))
 end
 
 
@@ -40,11 +50,11 @@ for i=1:length(Fylker)
     Ify = fn==(Fylker(i));
     
     % Precetage of units that are primary heating mechanisms
-    pctPrim(i)    = 1+(R*sum(([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*Primary))/...
+    pctPrim(i)    = 1+(Ratio*sum(([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*Primary))/...
         sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7))));
     
     % Precetage of fireplaces that are primary heating mechanisms
-    HpctPrim(i,:) = 1+R*((([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*Primary))/...
+    HpctPrim(i,:) = 1+Ratio*((([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*Primary))/...
         sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7))));
     
     % Calculate the number of consumption units per fylke (N_CU_F)
@@ -59,7 +69,7 @@ for i=1:length(Fylker)
     CpCU_F(i,1:4) = 1e6*Consumption(i)./N_CU_F(i,1:4);
     
 end
-save(sprintf('Number_of_Houses_with_FP_in_%04i.mat',yyyy),'N_CU_F','CpCU_F','CF','Consumption')
+% save(sprintf('Number_of_Houses_with_FP_in_%04i.mat',yyyy),'N_CU_F','CpCU_F','CF','Consumption')
 
 %--------------------------------------------------------------------------
 % 2nd Loop Kommuner to extract Kommune -level statistics
@@ -70,11 +80,11 @@ for i=1:length(Kommuner)
     Fpos=find(Fylker==unique(ALL(Ik,1)));
     
     % Precetage of fireplaces that are used as primary heating
-    pctPrim(i)    = 1+(R*sum(([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(Ik,4:7)).*Primary))/...
+    pctPrim(i)    = 1+(Ratio*sum(([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(Ik,4:7)).*Primary))/...
         sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(Ik,4:7))));
     
     % Precetage of fireplaces that are used as primary heating
-    HpctPrim(i,:) = 1+R*((([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(Ik,4:7)).*Primary))/...
+    HpctPrim(i,:) = 1+Ratio*((([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(Ik,4:7)).*Primary))/...
         sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(Ik,4:7))));
     
     % Here the four alternative methods for calculation calculates accordingly.

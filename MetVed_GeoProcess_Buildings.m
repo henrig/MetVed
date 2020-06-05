@@ -7,6 +7,9 @@ function [Sout] = MetVed_GeoProcess_Buildings(S)
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
 global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile 
+global text_div
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_GeoProcess_Buildings\n\n')
 
 if ~isfield(S,'KommuneNR')
     K = shaperead(MunicpalGeoFile);

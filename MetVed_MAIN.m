@@ -7,10 +7,12 @@
 % NILU: Jun 2020: Henrik Grythe 
 %--------------------------------------------------------------------------
 % 
-fprintf('In MetVed_MAIN\n\n')
 % add needed global fields
 global EFdata tfiles Res Cab
 global use_temporary_files do_Residential do_Cabins 
+
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_MAIN\n\n')
 
 % MAIN
 MetVed_check_Input()
@@ -22,14 +24,14 @@ MetVed_check_Input()
 if do_Residential
     Res = MetVed_GeoProcess_Buildings(Res);
     if use_temporary_files
-        save(tfiles(1),'Res')
+        save(tfiles.Residential,'Res')
     end
 end
 
 if do_Cabins
     Cab = MetVed_GeoProcess_Buildings(Cab);
     if use_temporary_files
-        save(tfiles(2),'Cab')
+        save(tfiles.Cabins,'Cab')
     end
 end
 
