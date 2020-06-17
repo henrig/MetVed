@@ -7,8 +7,8 @@ function [] = MetVed_Calculate_Residential_Consumption()
 % NILU: Jan 2018: Henrik Grythe
 %--------------------------------------------------------------------------
 
-global DryWoodFactor Emission_year Ratio text_div
-
+global DryWoodFactor Emission_year Ratio text_div EFdata Res
+global fp CF
 
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Calculate_Residential_Consumption\n\n')
@@ -27,7 +27,6 @@ Cons1D = squeeze(EFdata.resCON(:,:,Ey))*DryWoodFactor;
 EF1D   = array2table(squeeze(EFdata.resEF(:,:,Ey)')');
 spec   = EFdata.res2D;
 EF1D.Properties.VariableNames=spec;
-
 
 FylkeNr    = EFdata.res1D;
 FylkesNavn = EFdata.res1Dn;
@@ -50,31 +49,35 @@ end
 %--------------------------------------------------------------------------
 % 1st: Loop Fylker to extract Fylke -level statistics
 %--------------------------------------------------------------------------
-
 % get fp_ variables 
+global fp ec CF Primary
+
+MetVed_extract_dwelling_dependencies()
+
+
 % get ALL variable
+ALL =[extractfield(Res,'dwe_det');extractfield(Res,'dwe_2dw');extractfield(Res,'dwe_row');extractfield(Res,'dwe_mult')]';
 
 
-for i=1:length(Fylker)
-    If  = ALL(:,1)==Fylker(i);
-    Ify = fn==(Fylker(i));
+for i=1:length(FylkeNr)
+    If  = extractfield(Res,'FylkesNR')==FylkeNr(i);
+    Ify = fp.fn==(FylkeNr(i));
     
     % Precetage of units that are primary heating mechanisms
-    pctPrim(i)    = 1+(Ratio*sum(([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*Primary))/...
-        sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7))));
+    pctPrim(i)    = 1+(Ratio*sum(([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:)).*Primary))/...
+        sum([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:))));
     
     % Precetage of fireplaces that are primary heating mechanisms
-    HpctPrim(i,:) = 1+Ratio*((([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*Primary))/...
-        sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7))));
+    HpctPrim(i,:) = 1+Ratio*((([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:)).*Primary))/...
+        sum([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:))));
     
     % Calculate the number of consumption units per fylke (N_CU_F)
     % Here are four alternative methods for calculation offered.
-    N_CU_F(i,1)   = nansum(ALL(If,3));                                      % Consumption Unit: 1 per Residential dwelling
-    N_CU_F(i,2)   = (fp_APA(Ify)*nansum(ALL(If,7)) + fp_ROW(Ify)*nansum(ALL(If,6))...
-        + fp_TWO(Ify)*nansum(ALL(If,5))  + fp_ENE(Ify)*nansum(ALL(If,4)));  % Consumption Unit: 1 per Chimney
+    N_CU_F(i,1)   = nansum(nansum(ALL(If,:)));                                      % Consumption Unit: 1 per Residential dwelling
+    N_CU_F(i,2)   = (fp.APA(Ify)*nansum(ALL(If,4)) + fp.ROW(Ify)*nansum(ALL(If,3))...
+        + fp.TWO(Ify)*nansum(ALL(If,2))  + fp.ENE(Ify)*nansum(ALL(If,1)));  % Consumption Unit: 1 per Chimney
     N_CU_F(i,3)   = N_CU_F(i,2)*pctPrim(i);                                 % Consumption Unit: 1 = Corrected N average consumption based on primary / supplementary !! Need a housing type correction factor.
-    N_CU_F(i,4)   = sum([fp_ENE(Ify),fp_TWO(Ify),fp_ROW(Ify),fp_APA(Ify)].*nansum(ALL(If,4:7)).*HpctPrim(i,:).*CF(i,:)); %Consumption Unit: 1 = weighted units consumption for energy use RWC.
-    
+    N_CU_F(i,4)   = sum([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:)).*HpctPrim(i,:).*CF(i,:)); %Consumption Unit: 1 = weighted units consumption for energy use RWC.
     % Consumption per Consumption unit. (kg)
     CpCU_F(i,1:4) = 1e6*Consumption(i)./N_CU_F(i,1:4);
     

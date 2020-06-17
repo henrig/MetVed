@@ -9,7 +9,7 @@
 % 
 % add needed global fields
 global EFdata tfiles Res Cab
-global use_temporary_files do_Residential do_Cabins 
+global use_temporary_files do_Residential do_Cabins Res Cab
 
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_MAIN\n\n')
