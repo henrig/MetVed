@@ -30,7 +30,6 @@ fp.ENE   = (nh.TOT*0.82 -(nh.TWO.*fp.TWO +nh.ROW.*fp.ROW))./nh.ENE;
 %-------------------------------------------------------------------------- %
 % READ IN ENOVA STATISTICS FILE: it has categories for fylke and
 % dwelling type.
-[a,~,~]        = xlsread(HouseEnergy,'CleanCut');
 
 T = readtable(HouseEnergy,'Sheet','CleanCut');
 fprintf('Read file: %s\n',HouseEnergy)
@@ -52,17 +51,6 @@ for i=1:height(T)
     CF(i,4)  = ec(i).ap/ec(i).eb;
 end
 
-% 
-% for i=1:length(a)
-%     I=tfn==a(i,1);
-%     ec_eb(i) = a(i,4)+a(i,3)*FylkeHouseSize(I).size_eb;
-%     ec_tb(i) = a(i,4)+a(i,3)*FylkeHouseSize(I).size_tb;
-%     ec_rh(i) = a(i,4)+a(i,3)*FylkeHouseSize(I).size_rh;
-%     ec_ap(i) = a(i,6)+a(i,5)*FylkeHouseSize(I).size_ap;
-%     CF(i,1)  = ec_eb(i)/ec_eb(i);
-%     CF(i,2)  = ec_tb(i)/ec_eb(i);
-%     CF(i,3)  = ec_rh(i)/ec_eb(i);
-%     CF(i,4)  = ec_ap(i)/ec_eb(i);
-% end
+
 
 end

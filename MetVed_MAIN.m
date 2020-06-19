@@ -8,7 +8,7 @@
 %--------------------------------------------------------------------------
 % 
 % add needed global fields
-global EFdata tfiles Res Cab
+global EFdata tfiles Res Cab Emission_year
 global use_temporary_files do_Residential do_Cabins Res Cab
 
 fprintf('\n%s\n',text_div)
@@ -41,6 +41,15 @@ end
 if do_Residential
     MetVed_Calculate_Residential_Consumption()
     MetVed_Calculate_Residential_Emissions()
+    ofname = sprintf('%s_%i',ofiles.Residential,Emission_year);
+    prj = MetVed_ReadProjection()
+    dbfspec=makedbfspec(Res);
+    shapewrite(Res, ofname, 'DbfSpec', dbfspec)
+    pfilename=strcat(ofname,'.prj');
+    fid=fopen(pfilename,'w+');
+    fprintf(fid,'%s',prj);
+    fclose(fid);
+
 end
 % MetCab Stuff v
 if do_Cabins

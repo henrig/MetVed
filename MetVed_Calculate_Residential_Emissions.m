@@ -6,50 +6,44 @@ function [S] = MetVed_Calculate_Residential_Emissions()
 % 
 % NILU: Jan 2018: Henrik Grythe 
 %--------------------------------------------------------------------------
-global EFdata Res 
+global EFdata Res Emission_year text_div
+
+fprintf('\n%s\n',text_div)
+fprintf('In MetVed_Calculate_Residential_Emissions\n\n')
 
 % unit conversion
 KGtoTON =1e-3;
 GtoTON  =1e-6;
 
 % Load the shape 
-S = Res;
+T = struct2table(Res);
 
-% Extract the consumption field
-if isfield(S,param)
-    C = extractfield(S,param);
-else
-    error(sprintf('Missing field %s  in  KOMMUNE CONSUMPTION: \n %s \n',param,fname))
-end
+FylkeNr = unique(extractfield(Res,'FylkesNR'));
+Year = find(EFdata.res3D==Emission_year);
 
 
-ks    = sprintf('%04i',KmneNr);
-%ks=sprintf('%04i',KmneNr(1));
-% param='WC_WE'
-
-Fylke   = str2num(ks(1:2));
-fy      = find(FylkeNr == Fylke);
-Iy      = find(y==yyyy);
-% Claulate emissions
-for i=1:size(EF,2)
-    EM(:,i)=C'*EF(fy,i,Iy);
-end
-% disp(fy)
-
-fprintf('fylkeenummer / position     : %i / %i   \n',Fylke,fy) 
-fprintf('%04i Tons of Wood Conusmed  : %5.0f       \n',KmneNr,sum(C)*1e-3)
-fprintf('%04i Tons of PM2.5 Emissions: %6.2f       \n',KmneNr,sum(EM(:,1))*1e-6)
-fprintf('%04i Emission Factor        : %6.2f === %6.2f \n',KmneNr,sum(EM(:,1))/sum(C),EF(fy,1,Iy))
-
-
-% Assingn fields
-for i=1:length(C)
-    for j=1:size(SPEC,1)
-    S = setfield(S,{i},sprintf('%s_%i',char(SPEC(j)),yyyy),{1},EM(i,j));
+Emissions = zeros(size(Res,1),size(EFdata.resEF,2));
+for i =1:length(FylkeNr)
+    If = find(extractfield(EFdata,'res1D')==FylkeNr(i));
+    if ~isempty(If)
+        for c= 1:size(EFdata.resEF,2)
+            Emissions(If,c) = EFdata.resEF(If,c,Year)*extractfield(Res(If),'GridConsumption')';
+            Fname(c) = {sprintf('EM_%s(g)',char(EFdata.res2D(c)))};
+        end
+    else
+        fprintf('Something went wrong for FylkeNr %i \n',FylkeNr(i))
+        fprintf('\tFylkeNr %i , #HouseGrids: %i \n',FylkeNr(i),length(If))
+        fprintf('\tFylkeNr %i , #EFdata: %i \n',FylkeNr(i),i)
+        fprintf('\tFylkeNr %i , #HouseSTats: %i \n',FylkeNr(i),i)
+        fprintf('MISSING data\n%s\n',text_div)
+ 
     end
 end
 
-Tk = nansum(EM*1e-6,1);
+T= [T,array2table(Emissions)];
+idx = find(contains(T.Properties.VariableNames,'Emissions'));
+T.Properties.VariableNames(idx) = Fname;
+Res = table2struct(T);
 end
     
 
