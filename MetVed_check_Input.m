@@ -17,7 +17,7 @@ global pname ipath opath tpath
 global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile 
 global SSBfile OvenDensity HouseSizes HouseEnergy
 global text_div 
-global ifiles
+global ifiles prj
 %--------------------------------------------------------------------------
 
 fprintf('\n%s\n',text_div)
@@ -76,7 +76,7 @@ for i=1:length(ifiles)
     end
 end
 
-prj         = MetVed_read_projection(MunicpalGeoFile);
+prj = MetVed_read_projection(MunicpalGeoFile);
 
 
 

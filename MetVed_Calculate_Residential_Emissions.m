@@ -40,7 +40,7 @@ for i =1:length(FylkeNr)
     end
 end
 
-T= [T,array2table(Emissions)];
+T   = [T,array2table(Emissions)];
 idx = find(contains(T.Properties.VariableNames,'Emissions'));
 T.Properties.VariableNames(idx) = Fname;
 Res = table2struct(T);

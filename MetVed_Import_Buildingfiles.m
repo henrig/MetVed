@@ -14,6 +14,7 @@ function [Res,Cab] =  MetVed_Import_Buildingfiles()
 
 global ifiles tfiles Residentialpath CabinHousepath Emission_year
 global do_Residential do_Cabins use_temporary_files text_div
+global ResFile CabFile
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Import_Buildingfiles\n\n')
 
@@ -38,10 +39,10 @@ if do_Residential
     if use_temporary_files
         ce = split(ResFile,'/');
         try
-            tf = strcat('Temp/',char(ce(end)),'.mat');
+            tf = strcat('Temp/',char(ce(end)),sprintf('_%i',Emission_year),'.mat');
             load(tf)
             fprintf('Loaded temporary file from Temp\n')
-            tfiles.Residential =tf; 
+            tfiles.Residential = tf; 
         catch
             fprintf('No file found from :%s\n',tf)
             ifiles(a+1) = {ResFile};
