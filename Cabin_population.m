@@ -10,10 +10,16 @@ Calendar = Find_Norwegian_Holidays(date,Cabin_Population_file);
 
 Twe = readtable(Cabin_Population_file,'Sheet','TrafficVolume');
 for i = 1:height(Calendar)
-    weigh(i,1) = Twe.SummerWeek(Calendar.Weeknum(i))*cabindag(Calendar.Cabin_day(i))*Calendar.Summer_Factor(i);
-    weigh(i,2) = Twe.WinterWeek(Calendar.Weeknum(i))*cabindag(Calendar.Cabin_day(i))*Calendar.Winter_Factor(i);    
+    if Calendar.Weeknum(i)>0
+        weigh(i,1) = Twe.SummerWeek(Calendar.Weeknum(i))*cabindag(Calendar.Cabin_day(i))*Calendar.Summer_Factor(i);
+        weigh(i,2) = Twe.WinterWeek(Calendar.Weeknum(i))*cabindag(Calendar.Cabin_day(i))*Calendar.Winter_Factor(i);
+    else
+        weigh(i,1) = Twe.SummerWeek(1)*cabindag(Calendar.Cabin_day(i))*Calendar.Summer_Factor(i);
+        weigh(i,2) = Twe.WinterWeek(1)*cabindag(Calendar.Cabin_day(i))*Calendar.Winter_Factor(i);
+    end
+    
 end
 
-Calendar.PopWeight_Summer = weigh(:,1); 
+Calendar.PopWeight_Summer = weigh(:,1);
 Calendar.PopWeight_Winter = weigh(:,2);
 end
