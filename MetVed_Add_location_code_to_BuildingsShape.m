@@ -93,8 +93,9 @@ if ~ismember(Ftype,'Point')
     end
     Kommune(nk) = tk(:,1);
 end
+tk
 nk = find(Kommune==0);
-fprintf('Unasigned by midpoint %i\n',length(nk))
+fprintf('Unassigned by midpoint %i\n',length(nk))
 
 % Create and rename the variable. Then remake into a structure array.
 T         = struct2table(S);

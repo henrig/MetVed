@@ -6,7 +6,7 @@ function [Sout] = MetVed_GeoProcess_Buildings(S)
 % in MetVed_control.
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
-global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile 
+global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile AnnualTempFile
 global text_div
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_GeoProcess_Buildings\n\n')
@@ -35,6 +35,13 @@ if ~isfield(S,'CoastDST')
     T = shaperead(CoastLineFile);
     S  = MetVed_Add_Grid_DistanceToCoast(S,T);
 end
+
+if ~isfield(S,'AnnualTemp')
+    T = shaperead(AnnualTempFile);
+    S  = MetVed_Add_Grid_AnnualTemp(S,T);
+end
+
+
 Sout = S;
 end
 

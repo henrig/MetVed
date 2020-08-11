@@ -20,7 +20,7 @@ tfields = fieldnames(T);
 Ftype = S(1).Geometry;
 fprintf('Geometry found for houses = %s\n',Ftype)
 if ~ismember(Ftype,{'Point'})
-    fprintf('Calculating Grid center (meanX meanY) \n')
+    fprintf('Calculating Building Grid center (meanX meanY) \n')
     try
         for i= 1:length(S)
             x(i) = nanmean(extractfield(S(i),'X'));
@@ -44,8 +44,9 @@ end
 
 Ftype = T(1).Geometry;
 fprintf('Geometry found for Topography = %s\n',Ftype)
-hoyde = extractfield(T,'hoyde');
+
 if ismember(Ftype,{'Point'})
+hoyde = extractfield(T,'hoyde');
     try
         xt = extractfield(T,'X');
         yt = extractfield(T,'Y');
@@ -139,7 +140,7 @@ elseif  ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'z')))
     for i = 1:length(T)
         in = inpolygon(x,y,T(i).X,T(i).Y);
         if sum(in)>0
-            MASL(in) = T(i).minhoyde;
+            MASL(in) = T(i).z;
         end
         if rem(i,1000)==0; fprintf('Processed: %8i of %i  \n',i, length(T)); end
     end
