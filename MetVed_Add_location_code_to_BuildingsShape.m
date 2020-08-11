@@ -78,7 +78,7 @@ end
 
 % Place municipalities for those that do not have midpoint in a municipality
 nk = find(Kommune==0);
-fprintf('Unaasigned %i\n',length(nk))
+fprintf('Unasigned %i\n',length(nk))
 if ~ismember(Ftype,'Point')
     for i= 1:length(nk)
         xc = extractfield(S(nk(i)),'X');
@@ -93,6 +93,8 @@ if ~ismember(Ftype,'Point')
     end
     Kommune(nk) = tk(:,1);
 end
+nk = find(Kommune==0);
+fprintf('Unasigned by midpoint %i\n',length(nk))
 
 % Create and rename the variable. Then remake into a structure array.
 T         = struct2table(S);

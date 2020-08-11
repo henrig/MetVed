@@ -9,11 +9,13 @@ function [] = MetVed_Calculate_Cabin_Consumption()
 global DryWoodFactor Emission_year Ratio text_div EFdata Res
 global fp ec CF Primary Emission_year
 
+% DUMMY SCRIPT NEEDS ADAPTATION FOR CABINS
+
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Calculate_Residential_Consumption\n\n')
 
 % Extract the position of the year for EF and Consumption data:
-Ey  = find(EFdata.res3D ==Emission_year);
+Ey  = find(EFdata.cab3D == Emission_year);
 
 Tfylke = table;
 
@@ -22,14 +24,14 @@ Tfylke.ResFylker = unique(extractfield(Res,'FylkesNR'))';
 
 % Extract the existing fylkes number in the file:
 fprintf('Using dry Wood Factor of: %f \n',DryWoodFactor)
-Cons1D = squeeze(EFdata.resCON(:,:,Ey))*DryWoodFactor;
-EF1D   = array2table(squeeze(EFdata.resEF(:,:,Ey)')');
-spec   = EFdata.res2D;
+Cons1D = squeeze(EFdata.cabCON(:,:,Ey))*DryWoodFactor;
+EF1D   = array2table(squeeze(EFdata.cabEF(:,:,Ey)')');
+spec   = EFdata.cab2D;
 EF1D.Properties.VariableNames=spec;
 
-FylkeNr    = EFdata.res1D;
-FylkesNavn = EFdata.res1Dn;
-SFylkeNr   = unique(extractfield(Res,'FylkesNR'));
+FylkeNr    = EFdata.cab1D;
+FylkesNavn = EFdata.cab1Dn;
+SFylkeNr   = unique(extractfield(Cab,'FylkesNR'));
 
 % Write out no match Fylkes:
 Tn =[];

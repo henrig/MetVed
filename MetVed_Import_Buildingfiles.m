@@ -17,8 +17,8 @@ global do_Residential do_Cabins use_temporary_files text_div
 global ResFile CabFile
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Import_Buildingfiles\n\n')
-
-tf = cell(1,1); ;
+ifiles
+tf = cell(1,1);
 %--------------------------------------------------------------------------
 if do_Residential
     ResFile = sprintf('%sAll_Dwellings_%04i',Residentialpath,Emission_year);
@@ -73,7 +73,7 @@ if do_Cabins
     end
     if i >= yearlim
         fprintf('Year %i out of bounds\n', Emission_year)
-        Res =[];
+        Cab =[];
         return
     end
     if i>1; warning(sprintf('No Residential file for year %i \n using closest found %i ',Emission_year,Emission_year-i+1)); end
@@ -82,9 +82,9 @@ if do_Cabins
         ce = split(CabFile,'/');
         try
             tf = strcat('Temp/',char(ce(end)),'.mat');
-            fprintf('Loaded temporary file from :%s\n',tf)
+            fprintf('Checking to load temporary file from :%s\n',tf)
             load(tf)
-            tfiles.Cabins =tf; 
+            tfiles.Cabins =tf;
         catch
             fprintf('No file found in Temp\n')
             ifiles(a+1) = {CabFile};
@@ -93,10 +93,15 @@ if do_Cabins
             fprintf('Done\n')
             save(tf,'Cab')
         end
+    else
+        ifiles(a+1) = {CabFile};
+        fprintf('Reading large file ...')
+        Cab = shaperead(CabFile);
+        fprintf('Done\n')
     end
     
 else
-    Res =[];
+    Cab =[];
 end
 
 

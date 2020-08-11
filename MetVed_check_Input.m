@@ -32,7 +32,7 @@ if exist(pname,'dir')~=7 &&  exist(ipath,'dir')~=7 &&  exist(tpath,'dir')~=7
 else
     fprintf('MetVed will run in Folder: %s\n',pname)
     fprintf('MetVed input Folder:       %s\n',ipath)
-    fprintf('MetVed uses Temp Folder:   %s\n',ipath)
+    fprintf('MetVed uses Temp Folder:   %s\n',tpath)
 end
 fprintf('\n%s\n',text_div)
 % Give the option to create the output folder:

@@ -53,7 +53,7 @@ if ismember(Ftype,{'Point'})
         xt = extractfield(T,'x');
         yt = extractfield(T,'y');
     end
-    fprintf('Assigning elevation by nearest point \n')
+    fprintf('\t *Assigning elevation by nearest point \n')
     for i = 1:size(x,2)
         dst = sqrt((x(i)-xt).^2 + (y(i)-yt).^2);
         ele = find(dst==min(dst));
@@ -62,6 +62,7 @@ if ismember(Ftype,{'Point'})
     end
 end
 if ismember(Ftype,{'Line'})
+    fprintf('\t * Recognized Line file 20m file\n')
     % hoyder = extractfield(T,'hoyde');
     % unique(hoyder)
     
@@ -116,6 +117,7 @@ if ismember(Ftype,{'Line'})
 end
 
 if ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'minhoyde')))
+    fprintf('\t * Recognized Spatial file 0:500:2000 m polygon file\n')
     hoyder = extractfield(T,'minhoyde');
     unique(hoyder)
     idx = find(hoyder>0);
@@ -130,6 +132,21 @@ if ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'minhoyde')))
     st = struct2table(S);
     st.MASL = MASL';
     S = table2struct(st)
+elseif  ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'z')))
+    fprintf('\t * Recognized Orographical file 0.1x0.1 degree Grid \n')
+    hoyder = extractfield(T,'z');
+    MASL(1:length(x)) = 0;
+    for i = 1:length(T)
+        in = inpolygon(x,y,T(i).X,T(i).Y);
+        if sum(in)>0
+            MASL(in) = T(i).minhoyde;
+        end
+        if rem(i,1000)==0; fprintf('Processed: %8i of %i  \n',i, length(T)); end
+    end
+    st = struct2table(S);
+    st.MASL = MASL';
+    S = table2struct(st)
+   
 end
 
 Sout = S;

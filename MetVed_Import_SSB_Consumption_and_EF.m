@@ -17,6 +17,7 @@ function [EFdata] = MetVed_Import_SSB_Consumption_and_EF()
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
 global SSBfile debug_mode do_Cabins do_Residential text_div
+global ResSheet CabSheet EFSheet
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Import_SSB_Consumption_and_EF\n\n')
 
@@ -25,7 +26,7 @@ FP_type=[{'ALL'},{'Open'},{'Old'},{'New'}];
 
 ResSheet = '9703-3';
 CabSheet = '9704-3';
-EFSheet  = 'EF';
+EFSheet  = 'EF_2013';
 
 % Check file for correct sheets
 try
@@ -169,7 +170,7 @@ if do_Cabins
                     table2array(Efac(1,contains(hlEF,'Old')))*Cons(i,4,yr)+ ...
                     table2array(Efac(1,contains(hlEF,'New')))*Cons(i,3,yr) )/nansum(Cons(i,2:4,yr),2);
                 
-                if debug_mode; fprintf('%6.2f   ',EFres(i,comp,yr)); end
+                if debug_mode; fprintf('%6.2f   ',EFcab(i,comp,yr)); end
             end
             if debug_mode; fprintf('\n'); end
         end
@@ -177,7 +178,7 @@ if do_Cabins
     fprintf('Found Emission Factors (EF) for \n%i Fylker \n%i Compounds \n%i Years\n',size(EFcab))
     % Store outdata in struct.
     EFdata.cabCON    = Cons;
-    EFdata.cabEF     = EFres;
+    EFdata.cabEF     = EFcab;
     EFdata.cab1Dn    = FylkesNavn;
     EFdata.cab1D     = FylkeNr;
     EFdata.cab2D     = table2cell(Tef(:,1));

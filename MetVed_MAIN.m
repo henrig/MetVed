@@ -8,7 +8,7 @@
 %--------------------------------------------------------------------------
 % 
 % add needed global fields
-global EFdata tfiles Res Cab Emission_year ofiles
+global EFdata tfiles Res Cab Emission_year ofiles 
 global use_temporary_files do_Residential do_Cabins Res Cab
 global ResFile CabFile
 
