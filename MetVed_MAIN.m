@@ -57,7 +57,7 @@ end
 % MetCab Stuff v
 if do_Cabins
     MetVed_Calculate_Cabin_Consumption()
-    %MetVed_Calculate_Cabin_Emissions()
+    MetVed_Calculate_Cabin_Emissions()
     
     ofname = sprintf('%s_%i',ofiles.Cabins,Emission_year);
     dbfspec=makedbfspec(Cab);

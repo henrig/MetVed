@@ -6,20 +6,27 @@ function [] = MetVed_Calculate_Cabin_Consumption()
 %
 % NILU: Jan 2018: Henrik Grythe
 %--------------------------------------------------------------------------
-global DryWoodFactor Emission_year Ratio text_div EFdata Res
+global DryWoodFactor Emission_year Ratio text_div EFdata Cab
 global fp ec CF Primary Emission_year
 
-% DUMMY SCRIPT NEEDS ADAPTATION FOR CABINS
 
 fprintf('\n%s\n',text_div)
-fprintf('In MetVed_Calculate_Residential_Consumption\n\n')
+fprintf('In MetVed_Calculate_Cabin_Consumption\n\n')
+
+
+% DUMMY TABLE NEEDS INVESTIGATION FOR CABINS
+Tweight = table;
+Tweight.Label            = [{'Winter'};{'Summer'}];
+Tweight.fpCabins         = [1.0; 0.4];
+Tweight.UsageRateCabins  = [0.8; 1.0];
+Tweight.t2mWRange        = [repmat(0.3,2,1)]
 
 % Extract the position of the year for EF and Consumption data:
 Ey  = find(EFdata.cab3D == Emission_year);
 
 Tfylke = table;
 
-Tfylke.ResFylker = unique(extractfield(Res,'FylkesNR'))';
+Tfylke.CabLandsdel = unique(extractfield(Cab,'LandsdelsNR'))';
 % Check that it matches the fylkes in the GeoFile:
 
 % Extract the existing fylkes number in the file:
@@ -27,81 +34,115 @@ fprintf('Using dry Wood Factor of: %f \n',DryWoodFactor)
 Cons1D = squeeze(EFdata.cabCON(:,:,Ey))*DryWoodFactor;
 EF1D   = array2table(squeeze(EFdata.cabEF(:,:,Ey)')');
 spec   = EFdata.cab2D;
-EF1D.Properties.VariableNames=spec;
+EF1D.Properties.VariableNames = spec;
 
-FylkeNr    = EFdata.cab1D;
-FylkesNavn = EFdata.cab1Dn;
-SFylkeNr   = unique(extractfield(Cab,'FylkesNR'));
+LandsdelNr    = EFdata.cab1D;
+LandsdelNavn  = EFdata.cab1Dn;
+
+SLandsdelNr   = unique(extractfield(Cab,'LandsdelsNR'));
 
 % Write out no match Fylkes:
 Tn =[];
 for i =1: height(Tfylke)
     T = table;
-    idx = find(FylkeNr == Tfylke.ResFylker(i));
+    idx = find(LandsdelNr == Tfylke.CabLandsdel(i));
     if ~isempty(idx)
-        T.FylkeNavn(i) = FylkesNavn(idx);
-        T.FylkeNr(i)   = FylkeNr(idx);
-        T.ConsTot(i)   = Cons1D(idx,1);
+        T.LandsdelNavn(i) = LandsdelNavn(idx);
+        T.LandsdelNr(i)   = LandsdelNr(idx);
+        T.ConsTot(i)      = Cons1D(idx,1);
         Tn = [Tn;[T(i,:),EF1D(idx,:)]];
     else
-       fprintf('WARNING! No consumption for Fylke %i\n',Tfylke.ResFylker(i)) 
+        fprintf('WARNING! No consumption for Fylke %i\n',Tfylke.CabLandsdel(i))
     end
 end
-
-MetVed_extract_dwelling_dependencies()
 
 %--------------------------------------------------------------------------
 % 1st: Loop Fylker to extract Fylke -level statistics
 %--------------------------------------------------------------------------
 % Create a variable ALL that includes all buildings part of the
 % calculations.
+y = find(EFdata.cab3D==Emission_year);
 
-ALL =[extractfield(Res,'dwe_det');extractfield(Res,'dwe_2dw');extractfield(Res,'dwe_row');extractfield(Res,'dwe_mult')]';
-y = find(EFdata.res3D==Emission_year);
 % WOOD POTENTIAL OF EACH BUILDING in the Fylke
-WOODPOTENTIAL  = zeros(size(Res));
-GridConsumption = zeros(size(Res));
-Consumtion = table;
-for i=1:length(FylkeNr)
-    If  = find(extractfield(Res,'FylkesNR')==FylkeNr(i));
-    Ifc = find(EFdata.res1D==FylkeNr(i));
-    Ify = find(fp.fn==(FylkeNr(i)));
-    fprintf('%s \n',char(FylkesNavn(i)))
-    if isempty(If) || isempty(Ifc) ||  isempty(Ify)
-        fprintf('Something went wrong for FylkeNr %i \n',FylkeNr(i))
-        fprintf('\tFylkeNr %i , #HouseGrids: %i \n',FylkeNr(i),length(If))
-        fprintf('\tFylkeNr %i , #EFdata: %i \n',FylkeNr(i),Ifc)
-        fprintf('\tFylkeNr %i , #HouseSTats: %i \n',FylkeNr(i),Ify)
-        fprintf('MISSING data\n%s\n',text_div)
-    else       
-        % Here we apply 3 correction factors for building type and for 
-        % Multiplier = 1+fraction of fireplaces that are primary heating mechanisms
-        Multiplier(i,:) = 1+ Ratio*((([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:)).*Primary))/...
-            sum([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:))));
-        
-        % Calculate the number of consumption units per fylke (N_CU_F)
-        Consumption.TotalUnits(i)   = sum([fp.ENE(Ify),fp.TWO(Ify),fp.ROW(Ify),fp.APA(Ify)].*nansum(ALL(If,:)).*Multiplier(i,:).*CF(i,:));        
-        fprintf('Consumption Units : %i Units\n',round(Consumption.TotalUnits(i)))
-        
-        % Consumption per Consumption unit. (kg) per house type (1-4)
-        Consumption.per_Unit(i) = 1e6*EFdata.resCON(Ifc,1,y)./Consumption.TotalUnits(i);
-        fprintf('Consumption per Unit : %i kg\n',round(Consumption.per_Unit(i)))
-        
-        % GRIDDED WOOD POTENTIAL
-        WOODPOTENTIAL(If) = nansum([fp.ENE(Ify)*ALL(If,1)*Multiplier(i,1).*CF(Ify,1),fp.TWO(Ify)*ALL(If,2)*Multiplier(i,2).*CF(Ify,2),...
-        fp.ROW(Ify)*ALL(If,3)*Multiplier(i,3).*CF(Ify,3),fp.APA(Ify)*ALL(If,4)*Multiplier(i,4).*CF(Ify,4)],2);
-    
-        GridConsumption(If) =  WOODPOTENTIAL(If)*Consumption.per_Unit(i);
-    
-        fprintf('Dealt wood to FylkeNr %s: %i kg of : %4.1f Ton \n',char(FylkesNavn(i)),round(sum(GridConsumption(If))),EFdata.resCON(Ifc,1,y))
-    end
-end
-fprintf('Adding WOODPOTENTIAL and Grid Consumption to shape...\n')
-T = struct2table(Res);
-T.WOODPOTENTIAL   = WOODPOTENTIAL;
-T.GridConsumption = GridConsumption*DryWoodFactor;
-Res = table2struct(T);
-fprintf('Return\n')
+WOODPOTENTIAL   = zeros(size(Cab));
+GridConsumption = zeros(size(Cab));
+Consumtion      = table;
 
+for i=1:height(Tn)
+    fprintf('\n%s %02i\n',char(Tn.LandsdelNavn(i)),Tn.LandsdelNr(i))
+    If   = find(extractfield(Cab,'LandsdelsNR') == Tn.LandsdelNr(i));
+    
+    if ~isempty(If)
+        lCab = Cab(If);
+        nHol  = extractfield(lCab,'bui2hol'); nHol(isnan(nHol))=0;
+        nHut  = extractfield(lCab,'bui2hut'); nHut(isnan(nHut))=0;
+        nCab  = nHol+nHut;
+        
+        masl  = extractfield(lCab,'MASL'); masl(masl<0)=0;
+        coast = extractfield(lCab,'CoastDST');
+        t2m   = extractfield(lCab,'t2m');
+        
+        % Define a wintertime use cabin:
+        idh = masl  >   600;% moh
+        idc = coast > 40000;
+        idt = t2m   < 3;
+        idw = idh|idc|idt;
+        
+        mT = mean(t2m.*nCab)/(mean(nCab));
+        
+        fprintf('Units Hut: %5i  Hol: %5i CabTot: %5i ConsTot: %3.1f kT\n',nansum(nHut),nansum(nHol),sum(nCab),Tn.ConsTot(i))
+        fprintf('Coast min: %5i mean: %5i    max: %5i km \n',round(min(coast)/1000),round(mean(coast.*nCab)/(1000*mean(nCab))),round(max(coast)/1000))
+        fprintf('Masl. min: %5i mean: %5i    max: %5i m.a.s.l. \n',round(min(masl)),round(mean(masl.*nCab)/(mean(nCab))),round(max(masl)))
+        fprintf('Temp. min: %5i mean: %5i    max: %5i C \n',round(min(t2m)),round(mean(t2m.*nCab)/(mean(nCab))),round(max(t2m)))
+        
+        fprintf('Average consumption: %5.1f kg \n',1e6*Tn.ConsTot(i)/sum(nCab))
+        fprintf('Winter cabins: %5.1f %% \n',100*sum(nCab(idw))/sum(nCab))
+        
+        
+        
+        % Calculate a weighted z-score from normalized data.
+        nT = t2m-min(t2m);
+        nT = nT/max(nT);
+        nT = 1-Tweight.t2mWRange(1)*normalize(t2m);
+        
+        clear wp CABType WeightWood
+        for j=1:length(lCab)
+            %wp = N_cabins*
+            if idw(j)
+                idx = find(contains(Tweight.Label,'Winter'));
+                wp(j) = nCab(j)*Tweight.fpCabins(idx)*Tweight.UsageRateCabins(idx)*max(nT(j),0.2);
+                CABType(j) = 2;
+            else
+                idx = find(contains(Tweight.Label,'Summer'));
+                wp(j) = nCab(j)*Tweight.fpCabins(idx)*Tweight.UsageRateCabins(idx)*max(nT(j),0.2);
+                CABType(j) = 1;
+            end
+        end
+        WeightWood     = 1e6*Tn.ConsTot(i)*(wp/sum(wp));
+        
+        iw = CABType==2;
+        is = CABType==1;
+        AW = sum(WeightWood(iw))/sum(nCab(iw));
+        AS = sum(WeightWood(is))/sum(nCab(is));
+        fprintf('Average consumption: %5.1f kg WINTER \n',AW)
+        fprintf('Average consumption: %5.1f kg SUMMER \n',AS)
+        fprintf('R: %5.2f WINTER/SUMMER \n',AW/AS)
+        
+        WOODPOTENTIAL(If) = WeightWood;
+        
+        Tn.NumHol(i) = nansum(nHol);
+        Tn.NumHut(i) = nansum(nHut);
+    else
+        warning('##No Cabins found in Landsdel: %02i %s\n',Tn.LandsdelNr(i),char(Tn.LandsdelNavn(i)))
+        return
+    end
+    
+end
+tCab = struct2table(Cab);
+tCab.DryWoodCons = WOODPOTENTIAL;
+Cab = table2struct(tCab);
+
+totCON = 1e-6*extractfield(Cab,'DryWoodCons');
+fprintf('Had  : %5.1f kT \nBurnt: %5.1f kT \nRest : %5.1f kT \n',nansum(Tn.ConsTot),nansum(totCON),nansum(Tn.ConsTot)-nansum(totCON))
 
 end

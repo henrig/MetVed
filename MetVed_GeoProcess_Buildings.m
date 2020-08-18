@@ -36,7 +36,7 @@ if ~isfield(S,'CoastDST')
     S  = MetVed_Add_Grid_DistanceToCoast(S,T);
 end
 
-if ~isfield(S,'AnnualTemp')
+if ~isfield(S,'t2m')
     T = shaperead(AnnualTempFile);
     S  = MetVed_Add_Grid_AnnualTemp(S,T);
 end
