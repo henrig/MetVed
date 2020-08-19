@@ -78,10 +78,4 @@ end
 
 prj = MetVed_read_projection(MunicpalGeoFile);
 
-
-
-
-
-
-
 end

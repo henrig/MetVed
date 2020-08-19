@@ -8,14 +8,6 @@ function [Sout] = MetVed_Add_Grid_Elevation(S,T)
 % S = Input shape of GRID
 % T = Topografic reference file
 
-
-% Sfile ='/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/Shapefiles/SSB/2015/SSB_2015_250m_Dwelling';
-% S = shaperead(Sfile);
-% 
-% Tfile = '/storage/nilu/Inby/Emission_Group/Ancillary_Data/ShapeFiles/Topo/NO_topo_points';
-% Tfile = '/storage/nilu/Inby/Emission_Group/Ancillary_Data/ShapeFiles/Topo/NO_topo_lines';
-% Tfile = '/storage/nilu/Inby/Emission_Group/Ancillary_Data/ShapeFiles/Topo/NO_topo_area';
-% T = shaperead(Tfile);
 tfields = fieldnames(T);
 Ftype = S(1).Geometry;
 fprintf('Geometry found for houses = %s\n',Ftype)
@@ -42,10 +34,10 @@ else
     end
 end
 
-Ftype = T(1).Geometry;
-fprintf('Geometry found for Topography = %s\n',Ftype)
+Ftype2 = T(1).Geometry;
+fprintf('Geometry found for Topography = %s\n',Ftype2)
 
-if ismember(Ftype,{'Point'})
+if ismember(Ftype2,{'Point'})
 hoyde = extractfield(T,'hoyde');
     try
         xt = extractfield(T,'X');
@@ -62,7 +54,7 @@ hoyde = extractfield(T,'hoyde');
         S(i).MASL = hoyde(ele);
     end
 end
-if ismember(Ftype,{'Line'})
+if ismember(Ftype2,{'Line'})
     fprintf('\t * Recognized Line file 20m file\n')
     % hoyder = extractfield(T,'hoyde');
     % unique(hoyder)
@@ -117,7 +109,7 @@ if ismember(Ftype,{'Line'})
     
 end
 
-if ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'minhoyde')))
+if ismember(Ftype2,{'Polygon'}) && ~isempty(find(ismember(tfields,'minhoyde')))
     fprintf('\t * Recognized Spatial file 0:500:2000 m polygon file\n')
     hoyder = extractfield(T,'minhoyde');
     unique(hoyder)
@@ -133,10 +125,21 @@ if ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'minhoyde')))
     st = struct2table(S);
     st.MASL = MASL';
     S = table2struct(st)
-elseif  ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'z')))
+elseif  ismember(Ftype2,{'Polygon'}) && ~isempty(find(ismember(tfields,'z')))
+     try
+        for i= 1:length(T)
+            xt(i) = nanmean(extractfield(T(i),'X'));
+            yt(i) = nanmean(extractfield(T(i),'Y'));
+        end
+    catch
+        for i= 1:length(T)
+            xt(i) = nanmean(extractfield(T(i),'x'));
+            yt(i) = nanmean(extractfield(T(i),'y'));
+        end
+    end
     fprintf('\t * Recognized Orographical file 0.1x0.1 degree Grid \n')
     hoyder = extractfield(T,'z');
-    MASL(1:length(x)) = 0;
+    MASL(1:length(x)) = NaN;
     for i = 1:length(T)
         in = inpolygon(x,y,T(i).X,T(i).Y);
         if sum(in)>0
@@ -144,9 +147,22 @@ elseif  ismember(Ftype,{'Polygon'}) && ~isempty(find(ismember(tfields,'z')))
         end
         if rem(i,1000)==0; fprintf('Processed: %8i of %i  \n',i, length(T)); end
     end
+    nk = find(isnan(MASL)); 
+    fprintf('Unassigned Small-Grids  %i\n',length(nk))
+    
+    if ~isempty(nk)
+        for i =1 :length(nk)
+         dst = sqrt((x(nk(i))-xt).^2 + (y(nk(i))-yt).^2);
+         idx = find(dst ==(min(dst)));
+         MASL(nk(i)) = T(idx).z;
+        end
+        nk = find(isnan(MASL)); 
+        fprintf('Unassigned Small-Grids  %i\n',length(nk))
+    end
+
     st = struct2table(S);
     st.MASL = MASL';
-    S = table2struct(st)
+    S = table2struct(st);
    
 end
 

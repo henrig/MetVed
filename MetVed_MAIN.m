@@ -1,16 +1,21 @@
 %--------------------------------------------------------------------------
-% Metved: Emissions from Residential Wood Combustion 
+% Metved: Emissions from Residential & Cabin Wood Combustion in Norway
 %--------------------------------------------------------------------------
-% Explanation goes here: 
+% MetVed uses a control sheet to set and define global variables, input
+% paths, files and output along with some options. MAIN Loop for MetVed.
+% Controls the sequence and checks inputs. The primary reading routines are
+% called from MAIN. The parameter sheet, "Control" can either be called
+% from main or vice versa to run the model. 
+% 
+% This version of MetVed can calculate either both Cabin emissions and
+% Residential emissions, combine them or separately. It First calculates
+% annual emissions for one year, but also have associated functions for
+% timevariation and 
 
 % NILU: Jan 2018: Henrik Grythe
-% NILU: Jun 2020: Henrik Grythe 
+% NILU: Aug 2020: Henrik Grythe 
 %--------------------------------------------------------------------------
-% 
-% add needed global fields
-global EFdata tfiles Res Cab Emission_year ofiles 
-global use_temporary_files do_Residential do_Cabins Res Cab
-global ResFile CabFile
+
 
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_MAIN\n\n')
@@ -23,6 +28,7 @@ MetVed_check_Input()
 [Res,Cab] = MetVed_Import_Buildingfiles;
 
 if do_Residential
+    fprintf('\n%s\nResidential Buildings \n%s\n',text_div,text_div)
     Res = MetVed_GeoProcess_Buildings(Res);
     if use_temporary_files
         save(tfiles.Residential,'Res')
@@ -31,6 +37,7 @@ if do_Residential
 end
 
 if do_Cabins
+    fprintf('\n%s\n Cabins \n%s\n',text_div,text_div)
     Cab = MetVed_GeoProcess_Buildings(Cab);
     if use_temporary_files
         save(tfiles.Cabins,'Cab');  fprintf('Saved a new version of %s\n',tfiles.Cabins)
@@ -38,36 +45,31 @@ if do_Cabins
 end
 
 
-% MetVed Stuff v
+% MetVed  v
 if do_Residential
     MetVed_Calculate_Residential_Consumption()
-    MetVed_Calculate_Residential_Emissions()
-    
+    ResEm =MetVed_Calculate_Residential_Emissions();
     ofname = sprintf('%s_%i',ofiles.Residential,Emission_year);
-    dbfspec=makedbfspec(Res);
-    shapewrite(Res, ofname, 'DbfSpec', dbfspec)
-    
+    dbfspec=makedbfspec(ResEm);
+    shapewrite(ResEm, ofname, 'DbfSpec', dbfspec)
     prj = MetVed_read_projection(ResFile);
     pfilename=strcat(ofname,'.prj');
     fid=fopen(pfilename,'w+');
     fprintf(fid,'%s',prj);
     fclose(fid);
-
 end
-% MetCab Stuff v
+% MetCab  v
 if do_Cabins
     MetVed_Calculate_Cabin_Consumption()
-    MetVed_Calculate_Cabin_Emissions()
-    
+    CabEm = MetVed_Calculate_Cabin_Emissions();
     ofname = sprintf('%s_%i',ofiles.Cabins,Emission_year);
-    dbfspec=makedbfspec(Cab);
-    shapewrite(Cab, ofname, 'DbfSpec', dbfspec)
+    dbfspec=makedbfspec(CabEm);
+    shapewrite(CabEm, ofname, 'DbfSpec', dbfspec)
     
     prj = MetVed_read_projection(CabFile);
     pfilename=strcat(ofname,'.prj');
     fid=fopen(pfilename,'w+');
     fprintf(fid,'%s',prj);
     fclose(fid);
-
 end
 

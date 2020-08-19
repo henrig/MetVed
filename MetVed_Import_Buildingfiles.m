@@ -17,10 +17,11 @@ global do_Residential do_Cabins use_temporary_files text_div
 global ResFile CabFile
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Import_Buildingfiles\n\n')
-ifiles
+
 tf = cell(1,1);
 %--------------------------------------------------------------------------
 if do_Residential
+    fprintf('Doing Residential Buildings\n\n')   
     ResFile = sprintf('%sAll_Dwellings_%04i',Residentialpath,Emission_year);
     a = length(ifiles);
     yearlim = 50;
@@ -39,9 +40,9 @@ if do_Residential
     if use_temporary_files
         ce = split(ResFile,'/');
         try
-            tf = strcat('Temp/',char(ce(end)),sprintf('_%i',Emission_year),'.mat');
+            tf = strcat('Temp/',char(ce(end)),'.mat');
+            fprintf('Checking to load temporary file from :%s\n',tf)
             load(tf)
-            fprintf('Loaded temporary file from Temp\n')
             tfiles.Residential = tf; 
         catch
             fprintf('No file found from :%s\n',tf)
@@ -63,6 +64,7 @@ else
 end
 %--------------------------------------------------------------------------
 if do_Cabins
+    fprintf('Doing Cabins\n\n')  
     CabFile = sprintf('%sCabins_Only_%04i',CabinHousepath,Emission_year);
     a = length(ifiles);
     yearlim = 50;

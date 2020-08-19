@@ -1,10 +1,17 @@
 function [S] = MetVed_Calculate_Cabin_Emissions()
 %--------------------------------------------------------------------------
-% Metved: Emissions from Residential Wood Combustion 
+% Metved: Emissions from Cabin Wood Combustion 
 %--------------------------------------------------------------------------
-% Explanation goes here: 
-% 
-% NILU: Jan 2018: Henrik Grythe 
+% Function combines Emission Factors for all species that were defined in
+% the SSB sheet with gridded consumption. The gridded consumption is 
+% calculatet in MetVed. This calculates an annual emission for each grid.
+% Function uses global MetVed variables 
+%    Cab            : Struct  : cabin grid with field DryWoodCons 
+%    Emission_year  : Integer : Year of calculation
+%    EFData         : Struct  : Strucured Emission data from SSB
+%
+% NILU   : Jan 2018: Henrik Grythe 
+% Revised: Aug 2020: Henrik Grythe 
 %--------------------------------------------------------------------------
 global EFdata Cab Emission_year text_div
 
@@ -13,18 +20,16 @@ fprintf('In MetVed_Calculate_Cabin_Emissions\n\n')
 
 % unit conversion
 KGtoTON = 1e-3;
-GtoTON  =1e-6;
-
+GtoTON  = 1e-6;
 
 LandsdelNr = unique(extractfield(Cab,'LandsdelsNR'));
 Yr       = find(EFdata.cab3D==Emission_year);
-
 
 Emissions = zeros(size(Cab,1),size(EFdata.cabEF,2));
 for i =1:length(LandsdelNr)
     If = find(extractfield(EFdata,'cab1D')==LandsdelNr(i));
     Il = find(extractfield(Cab,'LandsdelsNR')==LandsdelNr(i));    
-    length(Il)
+    fprintf('Landsdel %i Cabins: %i \n',LandsdelNr(i),length(Il))
     if ~isempty(If)
         for c= 1:size(EFdata.cabEF,2)
             Emissions(Il,c) = EFdata.cabEF(If,c,Yr)*extractfield(Cab(Il),'DryWoodCons')';
@@ -40,13 +45,12 @@ for i =1:length(LandsdelNr)
 end
 % Load the shape 
 T = struct2table(Cab);
-
 T   = [T,array2table(Emissions)];
 idx = find(contains(T.Properties.VariableNames,'Emissions'));
 T.Properties.VariableNames(idx) = Fname;
-%T(1:100,:)
 
-
+% For Cabins all are expected to have the same Emission height.
+T.EmH(:) = 15; 
 
 S = table2struct(T);
 end
