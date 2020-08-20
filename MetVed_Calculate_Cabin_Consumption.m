@@ -64,6 +64,7 @@ end
 %--------------------------------------------------------------------------
 % Pre set WOOD POTENTIAL OF EACH BUILDING in the Fylke to zeros.
 WOODPOTENTIAL   = zeros(size(Cab));
+CABINTYPE       = zeros(size(Cab));
 GridConsumption = zeros(size(Cab));
 Consumtion      = table;
 
@@ -107,6 +108,7 @@ for i=1:height(Tn)
         % For each Grid calculate Wood Potential according to the type of
         % cabins in each grid.
         clear wp CABType WeightWood
+
         for j=1:length(lCab)
             %wp = N_cabins*
             if idw(j)
@@ -130,6 +132,7 @@ for i=1:height(Tn)
         fprintf('R: %5.2f WINTER/SUMMER \n',AW/AS)
         
         WOODPOTENTIAL(If) = WeightWood;
+        CABINTYPE(If)     = CABType;
         
         Tn.NumHol(i) = nansum(nHol);
         Tn.NumHut(i) = nansum(nHut);
@@ -142,6 +145,8 @@ end
 % Tabelize the struct for easy 
 tCab = struct2table(Cab);
 tCab.DryWoodCons = WOODPOTENTIAL;
+tCab.CabType     = CABINTYPE;
+
 Cab = table2struct(tCab);
 % Check that all wood has been burnt!
 totCON = 1e-6*extractfield(Cab,'DryWoodCons');

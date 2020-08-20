@@ -58,8 +58,10 @@ MetVed_extract_dwelling_dependencies()
 ALL =[extractfield(Res,'dwe_det');extractfield(Res,'dwe_2dw');extractfield(Res,'dwe_row');extractfield(Res,'dwe_mult')]';
 y = find(EFdata.res3D==Emission_year);
 % WOOD POTENTIAL OF EACH BUILDING in the Fylke
-WOODPOTENTIAL  = zeros(size(Res));
+WOODPOTENTIAL   = zeros(size(Res));
 GridConsumption = zeros(size(Res));
+LOLA_Frac       = zeros(size(Res));
+
 Consumtion = table;
 for i=1:length(FylkeNr)
     If  = find(extractfield(Res,'FylkesNR')==FylkeNr(i));
@@ -87,9 +89,11 @@ for i=1:length(FylkeNr)
         fprintf('Consumption per Unit : %i kg\n',round(Consumption.per_Unit(i)))
         
         % GRIDDED WOOD POTENTIAL
-        WOODPOTENTIAL(If) = nansum([fp.ENE(Ify)*ALL(If,1)*Multiplier(i,1).*CF(Ify,1),fp.TWO(Ify)*ALL(If,2)*Multiplier(i,2).*CF(Ify,2),...
-        fp.ROW(Ify)*ALL(If,3)*Multiplier(i,3).*CF(Ify,3),fp.APA(Ify)*ALL(If,4)*Multiplier(i,4).*CF(Ify,4)],2);
-    
+        wooduse = [fp.ENE(Ify)*ALL(If,1)*Multiplier(i,1).*CF(Ify,1),fp.TWO(Ify)*ALL(If,2)*Multiplier(i,2).*CF(Ify,2),...
+        fp.ROW(Ify)*ALL(If,3)*Multiplier(i,3).*CF(Ify,3),fp.APA(Ify)*ALL(If,4)*Multiplier(i,4).*CF(Ify,4)];
+        
+        WOODPOTENTIAL(If)   = nansum(wooduse,2);
+        LOLA_Frac(If)       = (WOODPOTENTIAL(If)-max(0,wooduse(:,4)))./WOODPOTENTIAL(If);
         GridConsumption(If) =  WOODPOTENTIAL(If)*Consumption.per_Unit(i);
     
         fprintf('Dealt wood to FylkeNr %s: %i kg of : %4.1f Ton \n',char(FylkesNavn(i)),round(sum(GridConsumption(If))),EFdata.resCON(Ifc,1,y))
@@ -98,6 +102,7 @@ end
 fprintf('Adding WOODPOTENTIAL and Grid Consumption to shape...\n')
 T = struct2table(Res);
 T.WOODPOTENTIAL   = WOODPOTENTIAL;
+T.SmallHouseFrac  = LOLA_Frac;
 T.GridConsumption = GridConsumption*DryWoodFactor;
 Res = table2struct(T);
 fprintf('Return\n')

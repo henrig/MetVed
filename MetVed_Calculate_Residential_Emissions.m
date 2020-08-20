@@ -41,6 +41,7 @@ for i =1:length(FylkeNr)
 end
 
 T   = [T,array2table(Emissions)];
+T.EmH = (T.SmallHouseFrac*15) + ((1-T.SmallHouseFrac)*30);
 idx = find(contains(T.Properties.VariableNames,'Emissions'));
 T.Properties.VariableNames(idx) = Fname;
 S   = table2struct(T);
