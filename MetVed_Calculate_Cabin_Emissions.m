@@ -32,8 +32,8 @@ for i =1:length(LandsdelNr)
     fprintf('Landsdel %i Cabins: %i \n',LandsdelNr(i),length(Il))
     if ~isempty(If)
         for c= 1:size(EFdata.cabEF,2)
-            Emissions(Il,c) = EFdata.cabEF(If,c,Yr)*extractfield(Cab(Il),'DryWoodCons')';
-            Fname(c) = {sprintf('EM_%s(g)',char(EFdata.cab2D(c)))};
+            Emissions(Il,c) = EFdata.cabEF(If,c,Yr)*extractfield(Cab(Il),'GridConsumption')';
+            Fname(c) = {sprintf('gEM_%s',char(EFdata.cab2D(c)))};
         end
     else
         fprintf('Something went wrong for LandsdelNr %i \n',LandsdelNr(i))

@@ -99,13 +99,13 @@ for i=1:length(FylkeNr)
         fprintf('Dealt wood to FylkeNr %s: %i kg of : %4.1f Ton \n',char(FylkesNavn(i)),round(sum(GridConsumption(If))),EFdata.resCON(Ifc,1,y))
     end
 end
-fprintf('Adding WOODPOTENTIAL and Grid Consumption to shape...\n')
+fprintf('Adding WOODPOTENTIAL and Grid Consumption to shape...\n...')
 T = struct2table(Res);
 T.WOODPOTENTIAL   = WOODPOTENTIAL;
 T.SmallHouseFrac  = LOLA_Frac;
 T.GridConsumption = GridConsumption*DryWoodFactor;
 Res = table2struct(T);
-fprintf('Return\n')
+fprintf('Done\n')
 
 
 end

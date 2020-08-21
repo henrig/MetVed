@@ -63,7 +63,7 @@ for i =1: height(Tfylke)
 end
 %--------------------------------------------------------------------------
 % Pre set WOOD POTENTIAL OF EACH BUILDING in the Fylke to zeros.
-WOODPOTENTIAL   = zeros(size(Cab));
+WOODUSE         = zeros(size(Cab));
 CABINTYPE       = zeros(size(Cab));
 GridConsumption = zeros(size(Cab));
 Consumtion      = table;
@@ -131,7 +131,7 @@ for i=1:height(Tn)
         fprintf('Average consumption: %5.1f kg SUMMER \n',AS)
         fprintf('R: %5.2f WINTER/SUMMER \n',AW/AS)
         
-        WOODPOTENTIAL(If) = WeightWood;
+        WOODUSE(If)       = WeightWood;
         CABINTYPE(If)     = CABType;
         
         Tn.NumHol(i) = nansum(nHol);
@@ -144,13 +144,12 @@ for i=1:height(Tn)
 end
 % Tabelize the struct for easy 
 tCab = struct2table(Cab);
-tCab.DryWoodCons = WOODPOTENTIAL;
-tCab.CabType     = CABINTYPE;
+tCab.GridConsumption = WOODUSE;
+tCab.CabType         = CABINTYPE;
 
 Cab = table2struct(tCab);
 % Check that all wood has been burnt!
-totCON = 1e-6*extractfield(Cab,'DryWoodCons');
+totCON = 1e-6*extractfield(Cab,'GridConsumption');
 fprintf('Had  : %5.1f kT \nBurnt: %5.1f kT \nRest : %5.1f kT \n',nansum(Tn.ConsTot),nansum(totCON),nansum(Tn.ConsTot)-nansum(totCON))
-
 
 end

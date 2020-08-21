@@ -47,6 +47,10 @@ end
 
 % MetVed  v
 if do_Residential
+    if use_temporary_files
+        save(tfiles.Residential,'Res')
+        fprintf('%sSaved a new version of %s\n%s\n',text_div,tfiles.Residential,text_div)
+    end
     MetVed_Calculate_Residential_Consumption()
     ResEm =MetVed_Calculate_Residential_Emissions();
     ofname = sprintf('%s_%i',ofiles.Residential,Emission_year);
@@ -60,6 +64,10 @@ if do_Residential
 end
 % MetCab  v
 if do_Cabins
+    if use_temporary_files
+        save(tfiles.Cabins,'Cab');  fprintf('Saved a new version of %s\n',tfiles.Cabins)
+    end
+
     MetVed_Calculate_Cabin_Consumption()
     CabEm = MetVed_Calculate_Cabin_Emissions();
     ofname = sprintf('%s_%i',ofiles.Cabins,Emission_year);
@@ -73,3 +81,4 @@ if do_Cabins
     fclose(fid);
 end
 
+[S] = MetVed_Combine_Emissions()
