@@ -82,3 +82,11 @@ if do_Cabins
 end
 
 [S] = MetVed_Combine_Emissions()
+ofname = sprintf('%sAll_Emissions_%i',opath,Emission_year);
+dbfspec=makedbfspec(S);
+shapewrite(S, ofname, 'DbfSpec', dbfspec)
+prj = MetVed_read_projection(ResFile);
+pfilename=strcat(ofname,'.prj');
+fid=fopen(pfilename,'w+');
+fprintf(fid,'%s',prj);
+fclose(fid);
