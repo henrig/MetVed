@@ -18,12 +18,8 @@ global EFdata Cab Emission_year text_div
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_Calculate_Cabin_Emissions\n\n')
 
-% unit conversion
-KGtoTON = 1e-3;
-GtoTON  = 1e-6;
-
 LandsdelNr = unique(extractfield(Cab,'LandsdelsNR'));
-Yr       = find(EFdata.cab3D==Emission_year);
+Yr         = find(EFdata.cab3D==Emission_year);
 
 Emissions = zeros(size(Cab,1),size(EFdata.cabEF,2));
 for i =1:length(LandsdelNr)
@@ -31,7 +27,7 @@ for i =1:length(LandsdelNr)
     Il = find(extractfield(Cab,'LandsdelsNR')==LandsdelNr(i));    
     fprintf('Landsdel %i Cabins: %i \n',LandsdelNr(i),length(Il))
     if ~isempty(If)
-        for c= 1:size(EFdata.cabEF,2)
+        for c = 1:size(EFdata.cabEF,2)
             Emissions(Il,c) = EFdata.cabEF(If,c,Yr)*extractfield(Cab(Il),'GridConsumption')';
             Fname(c) = {sprintf('gEM_%s',char(EFdata.cab2D(c)))};
         end

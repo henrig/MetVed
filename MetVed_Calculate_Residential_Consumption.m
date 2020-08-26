@@ -96,13 +96,14 @@ for i=1:length(FylkeNr)
         LOLA_Frac(If)       = (WOODPOTENTIAL(If)-max(0,wooduse(:,4)))./WOODPOTENTIAL(If);
         GridConsumption(If) =  WOODPOTENTIAL(If)*Consumption.per_Unit(i);
     
-        fprintf('Dealt wood to FylkeNr %s: %i kg of : %4.1f Ton \n',char(FylkesNavn(i)),round(sum(GridConsumption(If))),EFdata.resCON(Ifc,1,y))
+        fprintf('Dealt wood to FylkeNr %s: %4.1f kTon of : %4.1f kTon \n',char(FylkesNavn(i)),round(sum(GridConsumption(If)))*1e-6,EFdata.resCON(Ifc,1,y))
     end
 end
 fprintf('Adding WOODPOTENTIAL and Grid Consumption to shape...\n...')
 T = struct2table(Res);
 T.WOODPOTENTIAL   = WOODPOTENTIAL;
 T.SmallHouseFrac  = LOLA_Frac;
+fprintf('Drying wood!!!...\n...')
 T.GridConsumption = GridConsumption*DryWoodFactor;
 Res = table2struct(T);
 fprintf('Done\n')
