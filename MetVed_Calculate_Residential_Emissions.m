@@ -2,7 +2,10 @@ function [S] = MetVed_Calculate_Residential_Emissions()
 %--------------------------------------------------------------------------
 % Metved: Emissions from Residential Wood Combustion 
 %--------------------------------------------------------------------------
-% 
+% Function to merge grid consumption with EMission factors from struct. The
+% function assumes and do a crude test that the Counties of EMission
+% factors and Grid consumption adds up, and writes a warning if they fdo
+% not.
 % 
 % NILU: Jan 2018: Henrik Grythe 
 %--------------------------------------------------------------------------
