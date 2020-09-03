@@ -8,12 +8,7 @@ function [TV,dnew] = MetVed_Station_Timevariation(S,HDDfile)
 % Henrik Grythe -Dec.2017  -NILU, Kjeller
 % Henrik Grythe -Aug.2020  -NILU, Kjeller
 %--------------------------------------------------------------------------
-global Emission_year debug_mode
-
-
-utmTo = 33;
-Htres = 15;
-Cabin_Population_file = sprintf('%s%s','/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Input/','TV_Cabins.xlsx');
+global Emission_year debug_mode utmTo Htres Cabin_Population_file
 
 dn      = datenum([Emission_year,1,1,0,0,0]):1:datenum([Emission_year+1,1,0,0,0,0]);
 stepOut = 1/24;
@@ -26,16 +21,17 @@ fprintf('Getting School and Bank Holidays for: %s\n',datestr(max(dnew),'yyyy'))
 % Get CALENDAR with Holidays
 Calendar = Cabin_population(dn(1),Cabin_Population_file);
 
-% First calculate the HDD, should include if
+%--------------------------------------------------------------------------
+% First clean the input data and calculate the HDD, should include if
 % not working use secondary station.
 
-% [St,~,StT]=xlsread(HDDfile,'Stations');
-
 fprintf('Reading Stations & Data from HDDfile\n...\n')
-St        = readtable(HDDfile,'Sheet','Stations');
-SD        = readtable(HDDfile,'Sheet','Data');
+St        = readtable(HDDfile,'Sheet',sprintf('Stations_%i',Emission_year));
+SD        = readtable(HDDfile,'Sheet',sprintf('Data_%i',Emission_year));
 Odv       = datevec(SD.Date+ 693960);
 SD        = SD(Odv(:,1) == Emission_year,:);
+SD.Date   = SD.Date+ 693960;
+
 if isempty(SD)
     fprintf('No Station data for year: %i\n',Emission_year)
     return
@@ -47,13 +43,27 @@ nSD = table;
 nSt = table;
 for i=1:length(uID)
     found = SD(SD.St_no==uID(i) & ~isnan(SD.TAM),:);
-    st = find(St.Stnr==uID(i));
+    st    = find(St.Stnr==uID(i));
     if height(found)>300
         if debug_mode
             fprintf(' Using observation: %i %s\t',uID(i),char(St.Name(st)))
             fprintf(' Data points at this station %i\n',height(found))
         end
-        nSD = [nSD;found];
+        % Gap fill missing days 
+        found = SD(SD.St_no==uID(i),:);
+
+        nfound = table;
+        nfound.Date     = dn';
+        nfound.St_no(:) = found.St_no(1);
+        nfound.TAM(:)   = NaN;
+        nfound.TAN(:)   = NaN;
+        nfound.TAX(:)   = NaN; 
+        [ci ai bi] = intersect(nfound.Date,found.Date);
+        nfound.TAM(ai) = found.TAM(bi);
+        nfound.TAN(ai) = found.TAN(bi);
+        nfound.TAX(ai) = found.TAX(bi);
+        
+        nSD = [nSD;nfound];
         nSt = [nSt;St(st,:)];
     else
         fprintf('%i %s\t',uID(i),char(St.Name(st)))
@@ -64,7 +74,7 @@ end
 fprintf('Transforming to UTM %iN coordinates\n',utmTo)
 [x,y,~,~]   = wgs2utm(nSt.Latitude,nSt.Longitude,utmTo,'N');
 
-fprintf('Finding each Grids closest Station \n...\n')
+fprintf('Finding each Grids closest Station \n...')
 Nearest_Station = zeros(1,length(S));
 for i=1:length(S)
     cpx = nanmean(extractfield(S(i),'X'));
@@ -75,6 +85,7 @@ for i=1:length(S)
     Nearest_Station(i) = nSt.Stnr(st);
 end
 [S(1:end).Nearest_Station] = deal(Nearest_Station);
+fprintf(' Done \n')
 
 % update the unique station ID's to only include the ones with data.
 uID = unique(Nearest_Station);
@@ -88,9 +99,12 @@ week = [1,sum(week_end)/sum(week_day),sum(week_end)/sum(week_day)];
 
 % Calcu
 for i = 1:length(uID)
-    OBS = inpaint_nans(SD.TAM(SD.St_no==uID(i)));
+    OBS = inpaint_nans(nSD.TAM(nSD.St_no==uID(i)));
     D   = max(Htres-OBS,0);
+    
+    % Specific test to cut off some multiples of data present in 2018 data.
     DD  = D(1:min(length(dn),length(OBS)));
+    
     wHDD(i,:) = DD/sum(DD);
     
     % Calculate Daily Residential Weekday&HDD weight
@@ -126,6 +140,7 @@ for st = 1:length(uID)
         hwSum(i,st) = dwSum(st,doy)*week_end(date_vec(4)+1);
         hwWin(i,st) = dwWin(st,doy)*week_end(date_vec(4)+1);
     end
+    if rem(i,15)==0; fprintf('\n St %i/%i',i,length(uID)); end
     TV.hwRes = (hwRes(:,st)/sum(hwRes(:,st)));
     TV.hwSum = hwSum(:,st)/sum(hwSum(:,st));
     TV.hwWin = hwWin(:,st)/sum(hwWin(:,st));
@@ -144,9 +159,7 @@ fprintf('\n',uID(st))
 % plot(datenum(TVm.Time),TVm.W93140)
 % plot(datenum(TVm.Time),TVm.S93140)
 
-
-
-
+writetimetable(TV,sprintf('%s_%i.csv',ofiles.TV,Emission_year))
 end
 
 

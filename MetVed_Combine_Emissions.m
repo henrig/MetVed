@@ -109,7 +109,9 @@ pars = ceil(length(fuID)/Parssect);
 ts = now;
 ruID= [];
 fprintf('Go get a cup of coffee, this will take some time\n...\n')
+
 for p = 1 : Parssect
+    fprintf('Parse %i / %i @',p,Parssect)
     % split the unique ids into sections.
     if p == 1
         uID = fuID(1:pars);
@@ -123,27 +125,28 @@ for p = 1 : Parssect
         idr = find(tRes.SSBID==uID(i));
         idc = find(tCab.SSBID==uID(i));
         if ~isempty(idr) && ~isempty(idc)
+
             % merge the two tables to align columns
             tNow = [tRes(idr,:);tCab(idc,:)];
+            
             % add the additive columns
             ttemp = array2table(nansum(table2array(tNow(:,Iar)),1));
             ttemp.Properties.VariableNames = tNow.Properties.VariableNames(Iar);
-            
             % Treat the special column
             t2emp = array2table((table2array(tNow(1,Isr))*tNow.GridConsumption(1)+table2array(tNow(2,Isr))*tNow.GridConsumption(2))/nansum(tNow.GridConsumption));
             t2emp.Properties.VariableNames = tNow.Properties.VariableNames(Isr);
-            
             temp = [tNow(1,Ibr),ttemp,t2emp];
             
             tOut =[tOut;temp];
+
         else
             tOut =[tOut;tRes(idr,:);tCab(idc,:)];
         end
-        if rem(i,500)==0; fprintf('Parse %i / %i @ %i / %i\n',p,Parssect,i,length(uID)); end
+        if rem(i,1000)==0; fprintf('%3i%%,',floor(100*i/length(uID))); end
     end
+    fprintf('100%%\n')
     ts2 = now;
     fprintf('%3.1f min\n',(ts2-ts)*(24*60))
-    %    ruID=[ruID; uID];
 end
 
 % Make a very (unccesarily) heavy merge of two tables. Dealing with

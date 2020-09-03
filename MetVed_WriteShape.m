@@ -6,6 +6,7 @@ function [] = MetVed_WriteShape(S,PrjFile,ofname)
 %
 % NILU: Aug 2020: Henrik Grythe
 %--------------------------------------------------------------------------
+global text_div
 fprintf('\n%s\n',text_div)
 fprintf('In MetVed_WriteShape\n\n')
 
