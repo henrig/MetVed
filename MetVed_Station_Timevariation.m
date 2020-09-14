@@ -26,8 +26,13 @@ Calendar = Cabin_population(dn(1),Cabin_Population_file);
 % not working use secondary station.
 
 fprintf('Reading Stations & Data from HDDfile\n...\n')
-St        = readtable(HDDfile,'Sheet',sprintf('Stations_%i',Emission_year));
-SD        = readtable(HDDfile,'Sheet',sprintf('Data_%i',Emission_year));
+if Emission_year > 2018
+    St        = readtable(HDDfile,'Sheet',sprintf('Stations_%i',Emission_year));
+    SD        = readtable(HDDfile,'Sheet',sprintf('Data_%i',Emission_year));
+else
+    St        = readtable(HDDfile,'Sheet',sprintf('Stations'));
+    SD        = readtable(HDDfile,'Sheet',sprintf('Data'));
+end    
 Odv       = datevec(SD.Date+ 693960);
 SD        = SD(Odv(:,1) == Emission_year,:);
 SD.Date   = SD.Date+ 693960;
@@ -58,7 +63,7 @@ for i=1:length(uID)
         nfound.TAM(:)   = NaN;
         nfound.TAN(:)   = NaN;
         nfound.TAX(:)   = NaN; 
-        [ci ai bi] = intersect(nfound.Date,found.Date);
+        [ci, ai, bi] = intersect(nfound.Date,found.Date);
         nfound.TAM(ai) = found.TAM(bi);
         nfound.TAN(ai) = found.TAN(bi);
         nfound.TAX(ai) = found.TAX(bi);
