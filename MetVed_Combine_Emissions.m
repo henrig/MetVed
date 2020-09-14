@@ -135,7 +135,7 @@ for p = 1 : Parssect
             % Treat the special column
             t2emp = array2table((table2array(tNow(1,Isr))*tNow.GridConsumption(1)+table2array(tNow(2,Isr))*tNow.GridConsumption(2))/nansum(tNow.GridConsumption));
             t2emp.Properties.VariableNames = tNow.Properties.VariableNames(Isr);
-            temp = [tNow(1,Ibr),ttemp,t2emp];
+            temp  = [tNow(1,Ibr),ttemp,t2emp];
             
             tOut =[tOut;temp];
 

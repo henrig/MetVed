@@ -1,4 +1,4 @@
-function [TV,dnew] = MetVed_Station_Timevariation(S,HDDfile)
+function [TV,S] = MetVed_Station_Timevariation(S,HDDfile)
 %--------------------------------------------------------------------------
 % Metved: Emissions from Residential Wood Combustion
 %--------------------------------------------------------------------------
@@ -153,13 +153,7 @@ for st = 1:length(uID)
 end
 fprintf('\n',uID(st))
 
-% TVm = retime(TV,'monthly','mean')
-% plot(datenum(TVm.Time),TVm.R93140)
-% hold on
-% plot(datenum(TVm.Time),TVm.W93140)
-% plot(datenum(TVm.Time),TVm.S93140)
-
-writetimetable(TV,sprintf('%s_%i.csv',ofiles.TV,Emission_year))
+% writetimetable(TV,sprintf('%s_%i.csv',ofiles.TV,Emission_year))
 end
 
 

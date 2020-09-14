@@ -73,17 +73,21 @@ end
 
 if do_Residential && do_Cabins
     [TotEm] = MetVed_Combine_Emissions();
-    ofname = sprintf('%sAll_Emissions_%i',ofiles.Total,Emission_year);
-    MetVed_WriteShape(TotEm,ResFile,ofname)
 end
 
 % Timevariation
 if do_Residential && do_Cabins
-    [TV,dnew] = MetVed_Station_Timevariation(TotEm,HDDfile);
+    [TV,S] = MetVed_Station_Timevariation(TotEm,HDDfile);
+    ofname = sprintf('%s_%i',ofiles.Total,Emission_year);
+    MetVed_WriteShape(S,ResFile,ofname)
 elseif do_Residential
-    [TV,dnew] = MetVed_Station_Timevariation(ResEm,HDDfile);
+    [TV,S] = MetVed_Station_Timevariation(ResEm,HDDfile);
+    ofname = sprintf('%s_%i',ofiles.Residential,Emission_year);
+    MetVed_WriteShape(ResEm,ResFile,ofname)
 else
-    [TV,dnew] =MetVed_Station_Timevariation(CabEm,HDDfile);
+    [TV,S] = MetVed_Station_Timevariation(CabEm,HDDfile);
+    ofname = sprintf('%s_%i',ofiles.Cabins,Emission_year);
+    MetVed_WriteShape(S,CabFile,ofname)
 end
-
+writetimetable(TV,sprintf('%s_%i.csv',ofiles.TV,Emission_year))
 
