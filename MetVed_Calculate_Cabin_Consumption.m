@@ -23,9 +23,9 @@ Tweight.Label            = [{'Winter'};{'Summer'}];
 Tweight.fpCabins         = [1.0; 0.4];
 Tweight.UsageRateCabins  = [0.8; 1.0];
 Tweight.t2mWRange        = [0.3; NaN];
-Tweight.maslTresh        = [600; NaN];
-Tweight.coastalTresh     = [40;  NaN];
-Tweight.tempTresh        = [3;   NaN];
+Tweight.maslTresh        = [400; NaN]; % 600
+Tweight.coastalTresh     = [15;  NaN]; % 40
+Tweight.tempTresh        = [2;   NaN]; % 3
 
 fprintf('Table used for internal Cabin weighting \n for consumption distribution\n')
 disp(Tweight)

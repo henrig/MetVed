@@ -79,6 +79,17 @@ end
 fprintf('Transforming to UTM %iN coordinates\n',utmTo)
 [x,y,~,~]   = wgs2utm(nSt.Latitude,nSt.Longitude,utmTo,'N');
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %temporary
+% for i =1:length(x)
+% STAT(i).Geometry = 'Point';
+% STAT(i).X        = x(i);
+% STAT(i).Y        = y(i);
+% STAT(i).ID       = nSt.Stnr(i);
+% STAT(i).Year     = Emission_year;
+% end
+
+
 fprintf('Finding each Grids closest Station \n...')
 Nearest_Station = zeros(1,length(S));
 for i=1:length(S)
@@ -88,8 +99,15 @@ for i=1:length(S)
     distance = sqrt((x-cpx).^2+(y-cpy).^2)*1e-3; % km
     st       = find(distance==min(distance));
     Nearest_Station(i) = nSt.Stnr(st);
+    if rem(i,10000)==0; fprintf('.'); end
 end
-[S(1:end).Nearest_Station] = deal(Nearest_Station);
+% NOT WORKING CORRECTLY
+% [S(1:end).Nearest_Station] = deal(Nearest_Station');
+T = struct2table(S);
+T.Nearest_Station = Nearest_Station';
+S = table2struct(T);
+
+
 fprintf(' Done \n')
 
 % update the unique station ID's to only include the ones with data.
@@ -132,7 +150,7 @@ TV = timetable('RowTimes',datetime(datevec(dnew)));
 %TV.DateTime = datetime(datevec(dnew));
 for st = 1:length(uID)
     fprintf('%i, ',uID(st))
-    for i=1:length(dnew)
+    for i =1:length(dnew)
         date_vec = datevec(dnew(i));
         d        = datetime(date_vec);
         doy      = day(d,'dayofyear');
@@ -145,7 +163,7 @@ for st = 1:length(uID)
         hwSum(i,st) = dwSum(st,doy)*week_end(date_vec(4)+1);
         hwWin(i,st) = dwWin(st,doy)*week_end(date_vec(4)+1);
     end
-    if rem(i,15)==0; fprintf('\n St %i/%i',i,length(uID)); end
+    if rem(st,15)==0; fprintf('\n St %i/%i : ',st,length(uID)); end
     TV.hwRes = (hwRes(:,st)/sum(hwRes(:,st)));
     TV.hwSum = hwSum(:,st)/sum(hwSum(:,st));
     TV.hwWin = hwWin(:,st)/sum(hwWin(:,st));
