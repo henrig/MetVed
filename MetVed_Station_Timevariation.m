@@ -66,8 +66,11 @@ for i=1:length(uID)
         [ci, ai, bi] = intersect(nfound.Date,found.Date);
         nfound.TAM(ai) = found.TAM(bi);
         nfound.TAN(ai) = found.TAN(bi);
-        nfound.TAX(ai) = found.TAX(bi);
-        
+        try
+            nfound.TAX(ai) = found.TAX(bi);
+        catch
+          nfound.TAX(ai) = found.TAx(bi);
+        end
         nSD = [nSD;nfound];
         nSt = [nSt;St(st,:)];
     else

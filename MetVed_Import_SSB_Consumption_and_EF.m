@@ -5,9 +5,11 @@ function [EFdata] = MetVed_Import_SSB_Consumption_and_EF()
 % Function is part of the MetVed model and uses global parameters defined
 % in MetVed_control.
 %--------------------------------------------------------------------------
-% This function reads and structures the tables that come out of SSB API or
-% the SSB webpage. It assumes the structure of the SSB tables 9703-3 and
-% 9704.4 and an additional emission factor sheet that is added. The
+% This function reads and structures the tables that come out of SSB the
+% SSB webpage. It assumes the structure of the SSB tables: 
+% * 9703-3 and
+% * 9704.4 and 
+% * an additional emission factor sheet that is added. The
 % function looks for 4 categories of consumption and ties them with
 % emission factors for "Open" = 2, "New" = 3 and Old =  4, RWC emission
 % factors. Numerical assosiation is in accordance with SSB.
@@ -24,10 +26,6 @@ fprintf('In MetVed_Import_SSB_Consumption_and_EF\n\n')
 % Four categories of consumption is assumed.
 FP_type=[{'ALL'},{'Open'},{'Old'},{'New'}];
 
-ResSheet = '9703-3';
-CabSheet = '9704-3';
-EFSheet  = 'EF_2013';
-
 % Check file for correct sheets
 try
     ImportOptions = detectImportOptions(SSBfile,'Sheet',ResSheet);
@@ -35,7 +33,7 @@ try
     ImportOptions.DataRange='A5';
     Tres =readtable(SSBfile,ImportOptions);
 catch
-    fprintf('Warning; residental consumption sheet not found\n')
+    fprintf('### ERROR; residental consumption sheet not found\n')
     do_Residential = 0;
 end
 try
@@ -44,7 +42,7 @@ try
     ImportOptions.DataRange='A5';
     Tcab =readtable(SSBfile,ImportOptions);
 catch
-    fprintf('Warning; cabin consumption sheet not found\n')
+    fprintf('### ERROR; cabin consumption sheet not found\n')
     do_Cabins = 0;
 end
 try
@@ -52,7 +50,7 @@ try
     hlEF = Tef.Properties.VariableNames;
     fprintf('\tReading EF sheet         : %s\n',EFSheet)
 catch
-    fprintf('ERROR: No Emission Factors found\n')
+    fprintf('### ERROR: No Emission Factors found\n')
     return
 end
 fprintf('In file \n%s\n',SSBfile)
@@ -120,9 +118,9 @@ if do_Residential
 end
 
 if do_Cabins
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     fprintf('\n*CABINS\n')
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     fprintf('\tReading Cabin sheet      : %s\n',CabSheet)
     clear y yi
     % Read Norwegian county parts of the file

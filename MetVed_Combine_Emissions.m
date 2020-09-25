@@ -197,7 +197,42 @@ end
 tOut = [tOut;ttTot];
 tOut.RestoCabFrac =[frac,RestoCabFrac]';
 
+
 % Structurize the output table
 S    = table2struct(tOut);
+
+% Remove some fields not relevant for the output
+if isfield(S,{'KOMMUNENR'})
+    S = rmfield(S,{'KOMMUNENR'});
+end
+
+if isfield(S,{'FYLKENR'})
+    S = rmfield(S,{'FYLKENR'});
+end
+
+if isfield(S,{'FYLKE'})
+    S = rmfield(S,{'FYLKE'});
+end
+
+if isfield(S,{'WOODPOTENTIAL'})
+    S = rmfield(S,{'WOODPOTENTIAL'});
+end
+
+if isfield(S,{'SmallHouseFraction'})
+    S = rmfield(S,{'SmallHouseFraction'});
+end
+
+if isfield(S,{'dwe_area'})
+    S = rmfield(S,{'dwe_area'});
+end
+
+if isfield(S,{'dwe_oth'})
+    S = rmfield(S,{'dwe_oth'});
+end
+
+if isfield(S,{'dwe_com'})
+    S = rmfield(S,{'dwe_com'});
+end
+
 end
 
