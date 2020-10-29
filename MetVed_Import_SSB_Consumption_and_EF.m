@@ -145,6 +145,16 @@ if do_Cabins
     end
     fprintf('\n')
     
+    % Ann_Weight
+    try
+        TF = Tcab(ismember(Tcab.landsdel,'Hele Landet'),:);
+        for yr = 1:length(yi)
+            for Tech = 1:length(c)
+                Ann_Weight(Tech,yi(yr)) = table2array(TF(Tech,yi(yr)))/sum(table2array(TF(2:length(c),yi(yr))));
+            end
+        end
+    end
+    
     % Loop through years and copute each regions EF for that year for all
     % components EFres will be 3D:: EFres(County, Species, Year). We only
     % use consumption by technology.
@@ -153,10 +163,16 @@ if do_Cabins
         TF = Tcab(ismember(Tcab.landsdel,FylkesNavn(i)),:);
         if debug_mode; fprintf('Fylke : %02i %s\n',FylkeNr(i),char(FylkesNavn(i)) ); end
         for yr = 1:length(yi)
+            
             if debug_mode; fprintf('   year : %04i',y(yr)); end
             for Tech = 1:length(c)
                 TFT = TF(TF.Teknologinr==Tech,:);
                 Cons(i,Tech,yr) = table2array(TFT(:,yi(yr)));
+
+                if isnan(Cons(i,Tech,yr))
+                    Cons(i,Tech,yr)=Cons(i,1,yr)*Ann_Weight(Tech,yi(yr));
+                end
+                
                 if isnan(Cons(i,Tech,yr))
                     Cons(i,Tech,yr)=Cons(i,1,yr)*Weight(Tech);
                 end

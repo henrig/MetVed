@@ -25,7 +25,7 @@ Emissions = zeros(size(Cab,1),size(EFdata.cabEF,2));
 for i =1:length(LandsdelNr)
     If = find(extractfield(EFdata,'cab1D')==LandsdelNr(i));
     Il = find(extractfield(Cab,'LandsdelsNR')==LandsdelNr(i));    
-    fprintf('Landsdel %i Cabins: %i \n',LandsdelNr(i),length(Il))
+    fprintf('Landsdel %i Cabin Grids: %i \n',LandsdelNr(i),length(Il))
     if ~isempty(If)
         for c = 1:size(EFdata.cabEF,2)
             Emissions(Il,c) = EFdata.cabEF(If,c,Yr)*extractfield(Cab(Il),'GridConsumption')';
