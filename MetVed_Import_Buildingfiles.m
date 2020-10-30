@@ -1,3 +1,18 @@
+%--------------------------------------------------------------------------
+% This file is part of MetVed
+% 
+% MetVed is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation version 3.
+% 
+% MetVed is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with MetVed.  If not, see <https://www.gnu.org/licenses/>.
+%--------------------------------------------------------------------------
 function [Res,Cab] =  MetVed_Import_Buildingfiles()
 %--------------------------------------------------------------------------
 % Metved: Emissions from Residential Wood Combustion
@@ -21,7 +36,7 @@ fprintf('In MetVed_Import_Buildingfiles\n\n')
 tf = cell(1,1);
 %--------------------------------------------------------------------------
 if do_Residential
-    fprintf('Doing Residential Buildings\n\n')   
+    fprintf('Fetching Residential Buildings\n\n')   
     ResFile = sprintf('%sAll_Dwellings_%04i',Residentialpath,Emission_year);
     a = length(ifiles);
     yearlim = 50;
@@ -43,9 +58,10 @@ if do_Residential
             tf = strcat('Temp/',char(ce(end)),'.mat');
             fprintf('Checking to load temporary file from :%s\n',tf)
             load(tf)
+            fprintf('Loaded\n')
             tfiles.Residential = tf; 
         catch
-            fprintf('No file found from :%s\n',tf)
+            fprintf('### No file found from :%s\n',tf)
             ifiles(a+1) = {ResFile};
             fprintf('Reading large file ...')
             Res = shaperead(ResFile);
@@ -64,7 +80,7 @@ else
 end
 %--------------------------------------------------------------------------
 if do_Cabins
-    fprintf('Doing Cabins\n\n')  
+    fprintf('Fetching Cabins\n\n')  
     CabFile = sprintf('%sCabins_Only_%04i',CabinHousepath,Emission_year);
     a = length(ifiles);
     yearlim = 50;
@@ -88,7 +104,7 @@ if do_Cabins
             load(tf)
             tfiles.Cabins =tf;
         catch
-            fprintf('No file found in Temp\n')
+            fprintf('### No file found in Temp\n')
             ifiles(a+1) = {CabFile};
             fprintf('Reading large file ...')
             Cab = shaperead(CabFile);

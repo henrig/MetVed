@@ -1,3 +1,18 @@
+%--------------------------------------------------------------------------
+% This file is part of MetVed
+% 
+% MetVed is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation version 3.
+% 
+% MetVed is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with MetVed.  If not, see <https://www.gnu.org/licenses/>.
+%--------------------------------------------------------------------------
 function T= Find_Norwegian_Holidays(date,Cabin_Population_file)
 %--------------------------------------------------------------------------
 % This function finds the holidays in Norway for a given dates year. It is 

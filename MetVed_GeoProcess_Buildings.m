@@ -1,9 +1,25 @@
+%--------------------------------------------------------------------------
+% This file is part of MetVed
+% 
+% MetVed is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation version 3.
+% 
+% MetVed is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with MetVed.  If not, see <https://www.gnu.org/licenses/>.
+%--------------------------------------------------------------------------
 function [Sout] = MetVed_GeoProcess_Buildings(S)
 %--------------------------------------------------------------------------
 % Metved: Emissions from Residential Wood Combustion
 %--------------------------------------------------------------------------
 % Function is part of the MetVed model and uses global parameters defined
 % in MetVed_control.
+% Check for a set of fields MetVed wants is present, and if not 
 % NILU: Jun 2020: Henrik Grythe
 %--------------------------------------------------------------------------
 global MunicpalGeoFile CountyGeoFile LandGeoFile TopographyFile CoastLineFile AnnualTempFile CityAreaFile UrbanAreaFile
