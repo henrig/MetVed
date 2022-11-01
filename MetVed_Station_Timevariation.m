@@ -23,8 +23,8 @@ function [TV,S] = MetVed_Station_Timevariation(S,HDDfile)
 % Henrik Grythe -Dec.2017  -NILU, Kjeller
 % Henrik Grythe -Aug.2020  -NILU, Kjeller
 %--------------------------------------------------------------------------
-global Emission_year debug_mode utmTo Htres Cabin_Population_file
-
+global Emission_year debug_mode utmTo Htres Cabin_Population_file opath
+% S = TotEm; S = shaperead('/storage/nilu/Inby/Emission_Group/Emission_Models/MetVed/MetVed_v2/Output/MetAll_Emissions_nEF_2020')
 dn      = datenum([Emission_year,1,1,0,0,0]):1:datenum([Emission_year+1,1,0,0,0,0]);
 stepOut = 1/24;
 dnew    = min(dn):stepOut:max(dn)+1-stepOut;
@@ -47,26 +47,46 @@ if Emission_year > 2018
 else
     St        = readtable(HDDfile,'Sheet',sprintf('Stations'));
     SD        = readtable(HDDfile,'Sheet',sprintf('Data'));
-end    
-Odv       = datevec(SD.Date+ 693960);
-SD        = SD(Odv(:,1) == Emission_year,:);
-SD.Date   = SD.Date+ 693960;
+end
+
+if ~isempty(find(ismember(SD.Properties.VariableNames,'Date')))
+    Odv       = datevec(SD.Date+ 693960);
+    SD        = SD(Odv(:,1) == Emission_year,:);
+    SD.Date   = SD.Date+ 693960;
+elseif ~isempty(find(ismember(SD.Properties.VariableNames,'Tid_norskNormaltid_')))
+    SD.Date  = datenum(SD.Tid_norskNormaltid_,'dd.mm.yyyy');
+    Odv       = datevec(SD.Date);
+    SD        = SD(Odv(:,1) == Emission_year,:);
+else
+    
+end
+
+
 
 if isempty(SD)
     fprintf('No Station data for year: %i\n',Emission_year)
+    TV = NaN;
     return
 end
-uID = unique(SD.St_no);
-
+if ~isempty(find(ismember(SD.Properties.VariableNames,'St_no')))
+    uID = unique(SD.St_no);
+elseif ~isempty(find(ismember(SD.Properties.VariableNames,'Stasjon')))
+    tID  = SD.Stasjon;
+    SD.St_no   = str2num(char(regexprep(tID,'SN','')));
+    uID = unique(SD.St_no);
+    St.Stnr = str2num(char(regexprep(St.ID,'SN','')));
+    % St.Name = St.NAME; 
+else
+end
 % Extract stations with enough observation days:
 nSD = table;
 nSt = table;
 for i=1:length(uID)
     found = SD(SD.St_no==uID(i) & ~isnan(SD.TAM),:);
     st    = find(St.Stnr==uID(i));
-    if height(found)>300
+    if height(found)>300 && ~isempty(st)
         if debug_mode
-            fprintf(' Using observation: %i %s\t',uID(i),char(St.Name(st)))
+            fprintf(' Using observation: %i %s\t',uID(i),char(St.Name(st(1))))
             fprintf(' Data points at this station %i\n',height(found))
         end
         % Gap fill missing days 
@@ -89,7 +109,8 @@ for i=1:length(uID)
         nSD = [nSD;nfound];
         nSt = [nSt;St(st,:)];
     else
-        fprintf('%i %s\t',uID(i),char(St.Name(st)))
+        
+        fprintf('%6i %s\t',uID(i),char(St.Name(st)))
         warning(sprintf('Not enough data at this station %i Data threshold set to 300 days',height(found)))
     end
 end
@@ -116,11 +137,12 @@ for i=1:length(S)
     % regular euclidian distance
     distance = sqrt((x-cpx).^2+(y-cpy).^2)*1e-3; % km
     st       = find(distance==min(distance));
-    Nearest_Station(i) = nSt.Stnr(st);
+    Nearest_Station(i) = nSt.Stnr(st(1));
     if rem(i,10000)==0; fprintf('.'); end
 end
 % NOT WORKING CORRECTLY
 % [S(1:end).Nearest_Station] = deal(Nearest_Station');
+% USE INSTEAD:
 T = struct2table(S);
 T.Nearest_Station = Nearest_Station';
 S = table2struct(T);
@@ -147,6 +169,10 @@ for i = 1:length(uID)
     DD  = D(1:min(length(dn),length(OBS)));
     
     wHDD(i,:) = DD/sum(DD);
+
+    % independent addon a function for HDD 
+    HDD(:,i) =DD;
+    TMP(:,i) =OBS(1:min(length(dn),length(OBS)));
     
     % Calculate Daily Residential Weekday&HDD weight
     dwRes(i,:) = week(Calendar.Cabin_day).*wHDD(i,:);
@@ -160,6 +186,17 @@ for i = 1:length(uID)
     dwWin(i,:) = Calendar.PopWeight_Winter'.*wHDD(i,:);
     dwWin(i,:) = dwWin(i,:)/sum(dwWin(i,:));
 end
+
+
+% independendent addon a function for HDD
+THDD = array2table(HDD);
+TOBS = array2table(TMP);
+for i = 1:length(uID)
+    THDD.Properties.VariableNames(i) = {sprintf('SN%i',uID(i))};
+    TOBS.Properties.VariableNames(i) = {sprintf('SN%i',uID(i))};
+end
+writetable(THDD,sprintf('%s%s_%i.csv','DailyHDDat_Stations',opath,Emission_year))
+writetable(TOBS,sprintf('%s%s_%i.csv','DailyTANat_Stations',opath,Emission_year))
 %--------------------------------------------------------------------------
 % Make a timevariation that corresponds with Residential and the two types
 % of cabins for each station.
@@ -194,7 +231,7 @@ for st = 1:length(uID)
 end
 fprintf('\n',uID(st))
 
-% writetimetable(TV,sprintf('%s_%i.csv',ofiles.TV,Emission_year))
+%writetimetable(TV,sprintf('%s_%i.csv',ofiles.TV,Emission_year))
 end
 
 

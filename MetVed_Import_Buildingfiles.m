@@ -38,19 +38,21 @@ tf = cell(1,1);
 if do_Residential
     fprintf('Fetching Residential Buildings\n\n')   
     ResFile = sprintf('%sAll_Dwellings_%04i',Residentialpath,Emission_year);
-    a = length(ifiles);
+    a       = length(ifiles);
     yearlim = 50;
     i = 1;
+    fprintf('%s\n',ResFile)
     while ~exist(strcat(ResFile,'.shp')) && i < yearlim
         ResFile = sprintf('%sAll_Dwellings_%04i',Residentialpath,Emission_year-i);
         i=i+1;
     end
+    fprintf('%s\n',ResFile)
     if i >= yearlim
         fprintf('Year %i out of bounds\n', Emission_year)
         Res =[];
         return
     end
-    if i>1; warning(sprintf('No Residential file for year %i \n using closest found %i ',Emission_year,Emission_year-i+1)); end
+    if i>1; warning(sprintf('No Residential file for year %i \n using closest found %i ',Emission_year,Emission_year-i+1)); pause; end
     
     if use_temporary_files
         ce = split(ResFile,'/');

@@ -94,8 +94,18 @@ end
 % Merge data if needed
 if do_Residential && do_Cabins
     [TotEm] = MetVed_Combine_Emissions();
+    ofname = sprintf('%s_%i',ofiles.Total,Emission_year);
+    MetVed_WriteShape(TotEm,ResFile,ofname)
 end
 
+if patch_bergen_EF
+    if Emission_year >= 2021
+        if do_Residential;              ResEm = MetVed_MunicipalityPatch(ResEm,Municipality_list); end
+        if do_Cabins;                   CabEm = MetVed_MunicipalityPatch(CabEm,Municipality_list); end
+        if do_Residential && do_Cabins; TotEm = MetVed_MunicipalityPatch(TotEm,Municipality_list); end
+  end
+end
+%sla PROBLEM 08.06.2022: It writes total emissions with cab_name (MetCab_Emissions), instead of "MetAll...".
 %--------------------------------------------------------------------------
 % Timevariation
 if do_Residential && do_Cabins
@@ -103,7 +113,7 @@ if do_Residential && do_Cabins
     ofname = sprintf('%s_%i',ofiles.Total,Emission_year);
     MetVed_WriteShape(S,ResFile,ofname)
 elseif do_Residential
-    [TV,S] = MetVed_Station_Timevariation(ResEm,HDDfile);
+   [TV,S] = MetVed_Station_Timevariation(ResEm,HDDfile);
     ofname = sprintf('%s_%i',ofiles.Residential,Emission_year);
     MetVed_WriteShape(ResEm,ResFile,ofname)
 else
