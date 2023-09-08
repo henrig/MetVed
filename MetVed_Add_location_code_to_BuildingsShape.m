@@ -147,7 +147,30 @@ else
     fprintf('All Fields Assigned \n')
 end
 nk = find(Geography==0);
-fprintf('Unassigned by midpoint %i\n',length(nk))
+fprintf('Unassigned by center or corner %i\n',length(nk))
+
+
+Geography(nk) = -9;
+% tk = zeros(size(nk));
+% if ~isempty(tk)
+%     for i = 1:length(K)
+%         for j= 1:length(nk)
+%             xc = extractfield(S(nk(j)),'X');
+%             yc = extractfield(S(nk(j)),'Y');
+%             for n = 1:4 % try each corner
+%                 in = inpolygon(xc(n),yc(n),K(i).X,K(i).Y);
+%                 if in
+%                     tk(j) =NR(i);
+%                 end
+%             end
+%         end
+%     end
+%     Geography(nk) = tk;
+%     nk = find(Geography==0);
+%     fprintf('Unassigned Small-Grids by Corners %i\n',length(nk))
+% else
+%     fprintf('All Fields Assigned \n')
+% end
 
 
 
