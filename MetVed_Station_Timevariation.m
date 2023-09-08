@@ -195,8 +195,11 @@ for i = 1:length(uID)
     THDD.Properties.VariableNames(i) = {sprintf('SN%i',uID(i))};
     TOBS.Properties.VariableNames(i) = {sprintf('SN%i',uID(i))};
 end
-writetable(THDD,sprintf('%s%s_%i.csv','DailyHDDat_Stations',opath,Emission_year))
-writetable(TOBS,sprintf('%s%s_%i.csv','DailyTANat_Stations',opath,Emission_year))
+
+%writetable(THDD,sprintf('%s%s_%i.csv','DailyHDDat_Stations',opath,Emission_year))
+%writetable(TOBS,sprintf('%s%s_%i.csv','DailyTANat_Stations',opath,Emission_year))
+writetable(THDD,sprintf('%s%s_%i.csv',opath,'DailyHDDat_Stations',Emission_year))
+writetable(TOBS,sprintf('%s%s_%i.csv',opath,'DailyTANat_Stations',Emission_year))
 %--------------------------------------------------------------------------
 % Make a timevariation that corresponds with Residential and the two types
 % of cabins for each station.

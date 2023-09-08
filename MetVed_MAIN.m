@@ -74,7 +74,7 @@ if do_Residential
     MetVed_Calculate_Residential_Consumption()
     ResEm = MetVed_Calculate_Residential_Emissions();
     ofname = sprintf('%s_%i',ofiles.Residential,Emission_year);
-    MetVed_WriteShape(ResEm,ResFile,ofname)
+    % MetVed_WriteShape(ResEm,ResFile,ofname)
     fprintf('%s\nSimulation time elapsed %i min\n%s\n', text_div,round((now-timer)*60*24), text_div)
 end
 %--------------------------------------------------------------------------
@@ -87,7 +87,7 @@ if do_Cabins
     MetVed_Calculate_Cabin_Consumption()
     CabEm = MetVed_Calculate_Cabin_Emissions();
     ofname = sprintf('%s_%i',ofiles.Cabins,Emission_year);
-    MetVed_WriteShape(CabEm,CabFile,ofname)
+    % MetVed_WriteShape(CabEm,CabFile,ofname)
 end
 
 %--------------------------------------------------------------------------
@@ -105,6 +105,11 @@ if patch_bergen_EF
         if do_Residential && do_Cabins; TotEm = MetVed_MunicipalityPatch(TotEm,Municipality_list); end
   end
 end
+
+if do_Residential;              ofname = sprintf('%s_%i',ofiles.Residential,Emission_year); MetVed_WriteShape(ResEm,ResFile,ofname); end
+if do_Cabins;                   ofname = sprintf('%s_%i',ofiles.Cabins,Emission_year);      MetVed_WriteShape(CabEm,CabFile,ofname); end
+if do_Residential && do_Cabins; ofname = sprintf('%s_%i',ofiles.Total,Emission_year);       MetVed_WriteShape(TotEm,ResFile,ofname); end
+
 %sla PROBLEM 08.06.2022: It writes total emissions with cab_name (MetCab_Emissions), instead of "MetAll...".
 %--------------------------------------------------------------------------
 % Timevariation

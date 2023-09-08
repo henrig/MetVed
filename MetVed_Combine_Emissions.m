@@ -77,22 +77,35 @@ end
 % Deal with some old fields
 if isfield(ResEm,'KOMMUNENR')
     if ismember(class(tRes.KOMMUNENR),{'cell'})
+        ide = find(cellfun(@isempty,tRes.KOMMUNENR'));
+        if length(ide)>0; ide = find(cellfun(@isempty,tRes.KOMMUNENR')); end
+        tRes.KOMMUNENR(ide) ={'-999'};
         v = str2num(char(tRes.KOMMUNENR));
         tRes.KOMMUNENR = v;
     end
     if ismember(class(tCab.KOMMUNENR),{'cell'})
+        ide = find(cellfun(@isempty,tCab.KOMMUNENR'));
+        if length(ide)>0; tCab.KOMMUNENR(ide) ={'-999'}; end
         v = str2num(char(tCab.KOMMUNENR));
         tCab.KOMMUNENR = v;
+        fprintf('Cabin KOMMUNENR\n')
     end
 end
+
 if isfield(ResEm,'FYLKE')
     if ismember(class(tRes.FYLKE),{'cell'})
+        ide = find(cellfun(@isempty,tRes.FYLKE'));
+        if length(ide)>0; tRes.FYLKE(ide) ={'-999'}; end
         v = str2num(char(tRes.FYLKE));
         tRes.FYLKE = v;
+        fprintf('Residental FYLKENR\n')
     end
     if ismember(class(tCab.FYLKE),{'cell'})
+        ide = find(cellfun(@isempty,tCab.FYLKE'));
+        if length(ide)>0; tCab.FYLKE(ide) ={'-999'}; end
         v = str2num(char(tCab.FYLKE));
         tCab.FYLKE = v;
+        fprintf('Cabin FYLKENR\n')
     end
 end
 
